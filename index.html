@@ -312,10 +312,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
           <a class="btn btn-wa" href="#demo">▶ Ver la demo en vivo</a>
           <a class="btn btn-ghost" href="#calculadora">¿Cuánto me haría ganar?</a>
         </div>
-        <div class="sector-pick rv" id="sectorPick"><small>Elige tu sector</small></div>
+        <div class="sector-pick rv" id="sectorPick"><small>Sirve para cualquier negocio · mira un ejemplo</small></div>
       </div>
       <div class="float-cards" aria-hidden="true">
-        <div class="fc"><div class="ic">🗓️</div><div><b>Cita creada · 23:47</b><span id="fc1">Mechas · sábado 12:00</span></div></div>
+        <div class="fc"><div class="ic">🗓️</div><div><b>Cita creada · 23:47</b><span id="fc1">Servicio completo · sábado 12:00</span></div></div>
         <div class="fc"><div class="ic">⚡</div><div><b>Respondido en 4 s</b><span>Domingo, 02:13</span></div></div>
         <div class="fc"><div class="ic">🔥</div><div><b>Cliente interesado</b><span>Te llama mañana a las 10:00</span></div></div>
         <div class="fc"><div class="ic">⭐</div><div><b>Nueva reseña 5★</b><span>Google · pedida por el agente</span></div></div>
@@ -450,9 +450,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
         <div class="row3">
           <div><b id="oCli">0</b><span>clientes más</span></div>
           <div><b id="oHrs">0 h</b><span>de móvil ahorradas</span></div>
-          <div><b id="oRoi">0×</b><span>lo que cuesta el agente</span></div>
+          <div><b id="oAt">0</b><span>consultas atendidas al mes</span></div>
         </div>
-        <p class="fine">Estimación orientativa: mensajes al mes × % sin respuesta × % que compraría × gasto medio, frente a la cuota de 300 €/mes. Horas: unos 3 minutos por conversación.</p>
+        <p class="fine">Estimación orientativa: mensajes al mes × % sin respuesta × % que compraría × gasto medio. Horas: unos 3 minutos por conversación.</p>
       </div>
     </div>
   </div>
@@ -473,18 +473,17 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
   </div>
 </section>
 
-<!-- PRICE + FAQ -->
-<section id="precio">
+<!-- INCLUYE + FAQ -->
+<section id="incluye">
   <div class="wrap">
     <div class="sec-head rv">
-      <span class="eyebrow">Precio claro</span>
-      <h2>Menos de lo que cuesta <span class="grad">una media jornada</span></h2>
+      <span class="eyebrow">Sin complicaciones</span>
+      <h2>Tú atiendes tu negocio. <span class="grad">Nosotros, el resto.</span></h2>
     </div>
     <div class="price">
       <div class="pcard rv">
-        <span class="eyebrow">Agente de IA para tu negocio</span>
-        <div class="amt"><b>300 €</b><span>/ mes</span></div>
-        <div class="plus">+ 500 € de puesta en marcha · precios + IVA</div>
+        <span class="eyebrow">Qué incluye tu agente de IA</span>
+        <h3 style="font-size:clamp(26px,3vw,34px);font-weight:650;margin:16px 0 24px">Hecho a medida para tu negocio, sea del sector que sea</h3>
         <ul>
           <li>Entrenado con los servicios, precios y horarios de tu negocio</li>
           <li>Atiende en tus canales: WhatsApp, Instagram o web</li>
@@ -498,8 +497,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
         <details open><summary>¿Va a sonar a robot?</summary><p>No. Lo configuramos con tu forma de hablar: si tuteas, si usas emojis, cómo saludas. La mayoría de clientes no nota la diferencia; y si alguien pregunta, puede decir que es el asistente del negocio.</p></details>
         <details><summary>¿Y si le preguntan algo que no sabe?</summary><p>No se inventa nada. Si no tiene la respuesta, toma nota y te pasa la conversación a ti, con aviso al móvil, para que contestes cuando puedas.</p></details>
         <details><summary>¿Tengo que saber de tecnología?</summary><p>Nada. Nosotros lo montamos, lo conectamos y lo mantenemos. Tú solo recibes los avisos y miras tu agenda.</p></details>
-        <details><summary>¿Puedo cambiar precios o servicios después?</summary><p>Sí. Nos escribes y lo actualizamos. Los cambios están incluidos en la cuota mensual.</p></details>
-        <details><summary>¿Sirve para mi tipo de negocio?</summary><p>Si recibes mensajes de clientes, sí: peluquerías, estética, clínicas, restaurantes, tiendas, talleres, inmobiliarias… Esta demo cambia según el sector que elijas arriba.</p></details>
+        <details><summary>¿Puedo cambiar precios o servicios después?</summary><p>Sí. Nos escribes y lo actualizamos. Sin que tengas que tocar nada.</p></details>
+        <details><summary>¿Sirve para mi tipo de negocio?</summary><p>Si recibes mensajes de clientes, sí: peluquerías, estética, clínicas, restaurantes, tiendas, talleres, gimnasios, academias, asesorías, inmobiliarias… Esta demo cambia según el sector que elijas arriba, pero el agente se adapta a cualquier negocio.</p></details>
       </div>
     </div>
   </div>
@@ -549,6 +548,12 @@ const priceTxt = (p, per) => p === 0 ? 'gratis' : eur(p) + (per || '');
 
 /* ---------- Sectores ---------- */
 const S = {
+  general:{label:'Cualquier negocio',icon:'✨',neg:'Tu Negocio',cita:'cita',citas:'Citas creadas',staff:['Laura','Carlos'],ticket:50,cv:30,
+    svc:[['Primera consulta',30,0],['Servicio básico',45,30],['Servicio completo',90,60],['Presupuesto a medida',30,0]],
+    rec:{cli:'Sara',q:'Hola! tenéis hueco este sábado? quería info del servicio completo',a:'¡Hola Sara! 😊 El servicio completo son 60 € y dura alrededor de 1 h y media. Este sábado me quedan estos huecos:',slots:['10:00','12:00','17:00'],pick:1,s:2,
+      conf:'¡Listo! ✅ Sara, servicio completo el sábado a las 12:00 con Laura. Te mando un recordatorio el día antes por aquí. Si te surge cualquier duda, escríbeme a la hora que sea 💬'},
+    ven:{cli:'Marcos',ape:'Ruiz',q:'Buenas, tengo una empresa pequeña y querría presupuesto para varias personas',a:'¡Hola Marcos! Encantados 🙌 Para prepararte un presupuesto ajustado: ¿cuántas personas serían y para cuándo lo necesitáis?',r:'Somos 8 y nos vendría bien antes de final de mes',want:'Presupuesto empresa · 8 personas',val:480},
+    seg:{cli:'Carmen',s:1}},
   peluqueria:{label:'Peluquería',icon:'✂️',neg:'Tu Peluquería',cita:'cita',citas:'Citas creadas',staff:['Laura','Marta'],ticket:40,cv:30,
     svc:[['Corte y peinado',45,22],['Mechas / balayage',150,75],['Color de raíz',75,35],['Recogido',60,40]],
     rec:{cli:'Sara',q:'Holaa! tenéis hueco para unas mechas este sábado? cuánto cuestan?',a:'¡Hola Sara! 😊 Las mechas tipo balayage son 75 € y se tarda unas 2 h y media. Este sábado me quedan estos huecos:',slots:['09:00','12:00','16:30'],pick:1,s:1,
@@ -597,6 +602,18 @@ const S = {
       conf:'¡Apartado! ✅ Vestido verde talla M a tu nombre, recogida el sábado a las 12:00. Si prefieres que te lo enviemos, también hacemos envíos 📦'},
     ven:{cli:'Sonia',ape:'Prieto',q:'Hola! busco look completo para una boda en noviembre, me podéis ayudar?',a:'¡Claro, Sonia! 😍 Tenemos asesoría de estilo gratuita. ¿Qué talla usas y tienes algún color en mente? Te preparo 3 propuestas para cuando vengas.',r:'Una 38, y me gustaría algo en azul',want:'Look boda · talla 38 · azul',val:180},
     seg:{cli:'Eva',s:1}},
+  taller:{label:'Taller mecánico',icon:'🔧',neg:'Tu Taller',cita:'cita',citas:'Citas creadas',staff:['Toni','Raúl'],ticket:150,cv:30,
+    svc:[['Cambio de aceite y filtros',60,79],['Revisión pre-ITV',45,35],['Pastillas de freno',90,120],['Diagnosis electrónica',30,40]],
+    rec:{cli:'David',q:'Buenas, me ha salido un testigo en el coche y la semana que viene tengo ITV, podéis mirarlo el sábado?',a:'¡Buenas, David! 🔧 Te hacemos la diagnosis (40 €) y la revisión pre-ITV (35 €) en la misma visita. El sábado tengo:',slots:['09:00','11:00','12:30'],pick:0,s:1,
+      conf:'Hecho ✅ David, sábado a las 09:00 con Toni: diagnosis + revisión pre-ITV. Si hay que cambiar alguna pieza, te mandamos el presupuesto por aquí antes de tocar nada.'},
+    ven:{cli:'Lorena',ape:'Gil',q:'Hola, tenemos 3 furgonetas de reparto, hacéis mantenimiento para empresas?',a:'¡Hola Lorena! 🚐 Sí, tenemos plan de mantenimiento para flotas con prioridad en el taller. ¿Qué modelos son y cuántos km hacen al año más o menos?',r:'Son 3 Kangoo, unos 40.000 km al año cada una',want:'Mantenimiento de flota · 3 furgonetas',val:1400},
+    seg:{cli:'Paco',s:0}},
+  gimnasio:{label:'Gimnasio',icon:'🏋️',neg:'Tu Gimnasio',cita:'clase',citas:'Reservas creadas',staff:['Sandra','Nacho'],ticket:45,cv:25,
+    svc:[['Clase de prueba',60,0],['Entrenamiento personal',60,35],['Pilates reformer',50,15],['Cuota mensual',0,39]],
+    rec:{cli:'Laura',q:'Hola! quiero probar pilates, puedo ir a una clase este sábado?',a:'¡Hola Laura! 🧘 La primera clase de prueba es gratis. El sábado hay pilates reformer a estas horas:',slots:['10:00','11:00','12:00'],pick:1,s:0,
+      conf:'¡Reservada! ✅ Clase de prueba el sábado a las 11:00 con Sandra. Ven 10 minutos antes con ropa cómoda y calcetines antideslizantes 🧦'},
+    ven:{cli:'Óscar',ape:'Moreno',q:'Buenas, quiero ponerme en forma para el verano, tenéis entrenador personal?',a:'¡Buenas, Óscar! 💪 Sí, Nacho prepara planes personalizados con seguimiento. ¿Cuántos días a la semana podrías venir y tienes alguna lesión?',r:'3 días, y ninguna lesión',want:'Entrenamiento personal · 3 días/semana',val:420},
+    seg:{cli:'Marta',s:2}},
   inmobiliaria:{label:'Inmobiliaria',icon:'🏡',neg:'Tu Inmobiliaria',cita:'visita',citas:'Visitas agendadas',staff:['Ana','Luis'],ticket:3000,cv:4,
     svc:[['Piso 3 hab. en el centro',0,189000],['Ático con terraza',0,245000],['Alquiler 2 hab.',0,750],['Valoración de tu vivienda',30,0]],
     rec:{cli:'Carlos',q:'Hola, me interesa el piso de 3 habitaciones del centro, sigue disponible? se puede ver?',a:'¡Hola Carlos! 🏡 Sí, sigue disponible: 3 hab., 2 baños, 98 m², 189.000 €. Puedes visitarlo este sábado a estas horas:',slots:['10:00','11:00','12:30'],pick:1,s:0,
@@ -609,7 +626,7 @@ function matchSector(t){
   t = (t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
   if (!t) return null;
   if (S[t]) return t;
-  const rules = [['canin','canina'],['perro','canina'],['barber','barberia'],['una','unas'],['manicur','unas'],['estetic','unas'],['tatu','tatuajes'],['piercing','tatuajes'],['restaur','restaurante'],['bar','restaurante'],['cafe','restaurante'],['pasteler','tienda'],['florister','tienda'],['boutique','tienda'],['ropa','tienda'],['tienda','tienda'],['clinic','clinica'],['dental','clinica'],['fisio','clinica'],['inmobil','inmobiliaria'],['pelu','peluqueria']];
+  const rules = [['taller','taller'],['mecan','taller'],['coche','taller'],['gimnas','gimnasio'],['gym','gimnasio'],['crossfit','gimnasio'],['pilates','gimnasio'],['yoga','gimnasio'],['deport','gimnasio'],['canin','canina'],['perro','canina'],['barber','barberia'],['una','unas'],['manicur','unas'],['estetic','unas'],['tatu','tatuajes'],['piercing','tatuajes'],['restaur','restaurante'],['bar','restaurante'],['cafe','restaurante'],['pasteler','tienda'],['florister','tienda'],['boutique','tienda'],['ropa','tienda'],['tienda','tienda'],['clinic','clinica'],['dental','clinica'],['fisio','clinica'],['inmobil','inmobiliaria'],['pelu','peluqueria']];
   for (const [k,v] of rules) if (t.includes(k)) return v;
   return null;
 }
@@ -617,7 +634,7 @@ function matchSector(t){
 /* ---------- Personalización por URL ---------- */
 const P = new URLSearchParams(location.search);
 const NEG = (P.get('negocio')||'').trim().slice(0,60);
-let sec = matchSector(P.get('sector')) || 'peluqueria';
+let sec = matchSector(P.get('sector')) || 'general';
 const negName = () => NEG || S[sec].neg;
 
 function nextSaturday(){
@@ -637,7 +654,7 @@ function applySector(){
   $('#phAv').textContent = s.icon;
   $('#phName').textContent = negName();
   $('#pTitle').textContent = 'Panel de ' + negName();
-  $('#demoNeg').textContent = NEG ? `los clientes de ${NEG}` : `los clientes de tu ${s.label.toLowerCase()}`;
+  $('#demoNeg').textContent = NEG ? `los clientes de ${NEG}` : sec === 'general' ? 'tus clientes' : `los clientes de tu ${s.label.toLowerCase()}`;
   $('#sCitL').textContent = s.citas;
   $('#fc1').textContent = `${s.svc[s.rec.s][0]} · sábado ${s.rec.slots[s.rec.pick]}`;
   $('#rTk').value = Math.min(400, s.ticket); $('#rCv').value = s.cv;
@@ -922,7 +939,7 @@ function calc(){
   $('#vMsg').textContent=m; $('#vPct').textContent=p+' %'; $('#vTk').textContent=eur(tk); $('#vCv').textContent=cv+' %';
   const cli = Math.round(m*30*p/100*cv/100), money = cli*tk, hrs = Math.round(m*30*3/60);
   $('#oEur').textContent = eur(money); $('#oCli').textContent = cli; $('#oHrs').textContent = hrs+' h';
-  $('#oRoi').textContent = (money/300).toLocaleString('es-ES',{maximumFractionDigits:1})+'×';
+  $('#oAt').textContent = (m*30).toLocaleString('es-ES');
 }
 ['rMsg','rPct','rTk','rCv'].forEach(id => $('#'+id).addEventListener('input', calc));
 
