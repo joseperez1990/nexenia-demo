@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reservar demo · Nexenia</title>
+<meta name="description" content="Elige día y hora para una demo de 15 minutos con Nexenia.">
+<style>
+  :root { --cian: #22c3e6; --violeta: #7c5cf0; --texto: #e8ecff; --suave: #a7b0d6; --fondo: #0b1020; --caja: #121936; --borde: #232c55; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; color: var(--texto); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+         background: radial-gradient(circle at 15% 0%, #22164a 0, transparent 50%), radial-gradient(circle at 100% 100%, #0b3140 0, transparent 45%), var(--fondo); }
+  main { max-width: 640px; margin: 0 auto; padding: 28px 16px 48px; }
+  .logo { display: block; width: 180px; max-width: 60%; height: auto; border-radius: 10px; margin: 0 auto 20px; }
+  h1 { font-size: clamp(24px, 5vw, 32px); line-height: 1.2; margin: 0 0 8px; text-align: center; }
+  h1 span { background: linear-gradient(120deg, var(--cian), var(--violeta)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .intro { text-align: center; color: var(--suave); margin: 0 0 26px; }
+  .paso { background: var(--caja); border: 1px solid var(--borde); border-radius: 18px; padding: 18px; margin-bottom: 16px; }
+  .paso h2 { font-size: 16px; margin: 0 0 12px; display: flex; gap: 10px; align-items: center; }
+  .paso h2 b { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; font-size: 13px;
+               background: linear-gradient(135deg, var(--cian), var(--violeta)); color: #0b1020; }
+  .dias { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
+  .dia, .hora { border: 1px solid var(--borde); background: #0e1430; color: var(--texto); border-radius: 12px; cursor: pointer; font: inherit; }
+  .dia { min-width: 74px; padding: 10px 8px; text-align: center; flex: 0 0 auto; }
+  .dia small { display: block; color: var(--suave); font-size: 12px; text-transform: capitalize; }
+  .dia strong { display: block; font-size: 22px; line-height: 1.1; }
+  .horas { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+  .hora { padding: 10px 6px; }
+  .dia[aria-pressed="true"], .hora[aria-pressed="true"] { border-color: var(--cian); background: linear-gradient(135deg, rgba(34,195,230,.22), rgba(124,92,240,.22)); }
+  .dia:focus-visible, .hora:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid var(--cian); outline-offset: 2px; }
+  .vacio { color: var(--suave); font-size: 14px; margin: 0; }
+  label { display: block; font-size: 14px; color: var(--suave); margin: 0 0 4px; }
+  input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--borde); background: #0e1430; color: var(--texto); font: inherit; margin-bottom: 12px; }
+  .resumen { text-align: center; color: var(--suave); min-height: 24px; margin: 6px 0 12px; }
+  .resumen b { color: var(--texto); }
+  .confirmar { width: 100%; border: 0; border-radius: 14px; padding: 16px; font: 700 17px system-ui, sans-serif; cursor: pointer;
+               background: #25d366; color: #05210f; box-shadow: 0 10px 30px rgba(37,211,102,.25); }
+  .confirmar:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+  .nota { text-align: center; font-size: 13px; color: var(--suave); margin-top: 14px; }
+  .nota a { color: var(--cian); }
+</style>
+</head>
+<body>
+<main>
+  <img class="logo" src="logo-nexenia.png" alt="Nexenia">
+  <h1>Reserva tu <span>demo de 15 minutos</span></h1>
+  <p class="intro" id="intro">Elige el día y la hora que mejor te vengan. Te llamo yo, sin compromiso.</p>
+
+  <section class="paso">
+    <h2><b>1</b> Elige el día</h2>
+    <div class="dias" id="dias" role="group" aria-label="Días disponibles"></div>
+  </section>
+
+  <section class="paso">
+    <h2><b>2</b> Elige la hora</h2>
+    <div class="horas" id="horas" role="group" aria-label="Horas disponibles"><p class="vacio">Primero elige un día.</p></div>
+  </section>
+
+  <section class="paso">
+    <h2><b>3</b> Tus datos</h2>
+    <label for="nombre">Tu nombre</label>
+    <input id="nombre" autocomplete="name" placeholder="Ej.: Laura">
+    <label for="empresa">Empresa</label>
+    <input id="empresa" autocomplete="organization" placeholder="Ej.: Clínica Dental Sonrisa">
+    <label for="telefono">Teléfono para llamarte</label>
+    <input id="telefono" type="tel" autocomplete="tel" placeholder="Ej.: 600 123 456">
+  </section>
+
+  <p class="resumen" id="resumen" aria-live="polite"></p>
+  <button class="confirmar" id="confirmar" type="button" disabled>Confirmar cita por WhatsApp</button>
+  <p class="nota">Al confirmar se abre WhatsApp con tu reserva escrita: solo tienes que enviarla.<br>
+    ¿Prefieres otro momento? Escríbeme al <a href="https://wa.me/34642375023">642 375 023</a>.</p>
+</main>
+
+<script>
+(function () {
+  var WHATSAPP = "34642375023";
+  var HORAS = ["09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30",
+               "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30"];
+  var SABADO = ["09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30"];
+  var elegido = { dia: null, hora: null };
+
+  var p = new URLSearchParams(location.search);
+  var empresaURL = (p.get("empresa") || "").slice(0, 80);
+  if (empresaURL) {
+    document.getElementById("empresa").value = empresaURL;
+    document.getElementById("intro").textContent = "Demo para " + empresaURL + ": elige el día y la hora que mejor os vengan. Te llamo yo, sin compromiso.";
+  }
+
+  var fmtDia = new Intl.DateTimeFormat("es-ES", { weekday: "short" });
+  var fmtMes = new Intl.DateTimeFormat("es-ES", { month: "short" });
+  var fmtLargo = new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "long" });
+
+  function horasDe(fecha) {
+    var lista = fecha.getDay() === 6 ? SABADO : HORAS;
+    var ahora = new Date();
+    if (fecha.toDateString() !== ahora.toDateString()) return lista;
+    // Hoy: solo horas con al menos 2 horas de margen.
+    return lista.filter(function (h) {
+      var t = h.split(":");
+      var d = new Date(fecha); d.setHours(+t[0], +t[1], 0, 0);
+      return d - ahora > 2 * 3600 * 1000;
+    });
+  }
+
+  var dias = [];
+  var d = new Date(); d.setHours(12, 0, 0, 0);
+  while (dias.length < 12) {
+    if (d.getDay() !== 0 && horasDe(d).length) dias.push(new Date(d));
+    d.setDate(d.getDate() + 1);
+  }
+
+  var cajaDias = document.getElementById("dias");
+  var cajaHoras = document.getElementById("horas");
+  dias.forEach(function (f) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "dia"; b.setAttribute("aria-pressed", "false");
+    b.innerHTML = "<small></small><strong></strong><small></small>";
+    b.children[0].textContent = fmtDia.format(f).replace(".", "");
+    b.children[1].textContent = f.getDate();
+    b.children[2].textContent = fmtMes.format(f).replace(".", "");
+    b.setAttribute("aria-label", fmtLargo.format(f));
+    b.onclick = function () { elegirDia(f, b); };
+    cajaDias.appendChild(b);
+  });
+
+  function marcar(contenedor, boton) {
+    contenedor.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === boton ? "true" : "false"); });
+  }
+
+  function elegirDia(f, b) {
+    elegido.dia = f; elegido.hora = null;
+    marcar(cajaDias, b);
+    cajaHoras.innerHTML = "";
+    horasDe(f).forEach(function (h) {
+      var bh = document.createElement("button");
+      bh.type = "button"; bh.className = "hora"; bh.textContent = h; bh.setAttribute("aria-pressed", "false");
+      bh.onclick = function () { elegido.hora = h; marcar(cajaHoras, bh); actualizar(); };
+      cajaHoras.appendChild(bh);
+    });
+    actualizar();
+  }
+
+  var campos = ["nombre", "empresa", "telefono"].map(function (id) { return document.getElementById(id); });
+  campos.forEach(function (c) { c.addEventListener("input", actualizar); });
+  var boton = document.getElementById("confirmar");
+  var resumen = document.getElementById("resumen");
+
+  function telValido(t) { return t.replace(/\D/g, "").length >= 9; }
+
+  function actualizar() {
+    var listo = elegido.dia && elegido.hora && campos[0].value.trim() && telValido(campos[2].value);
+    boton.disabled = !listo;
+    resumen.innerHTML = "";
+    if (elegido.dia && elegido.hora) {
+      resumen.appendChild(document.createTextNode("Tu demo: "));
+      var b = document.createElement("b");
+      b.textContent = fmtLargo.format(elegido.dia) + " a las " + elegido.hora;
+      resumen.appendChild(b);
+    } else if (elegido.dia) {
+      resumen.textContent = "Ahora elige la hora.";
+    }
+  }
+
+  boton.onclick = function () {
+    if (boton.disabled) return;
+    var texto = "Hola, quiero reservar la demo de 15 minutos de Nexenia.\n\n" +
+      "📅 " + fmtLargo.format(elegido.dia) + " a las " + elegido.hora + "\n" +
+      "👤 " + campos[0].value.trim() + "\n" +
+      "🏢 " + (campos[1].value.trim() || "—") + "\n" +
+      "📞 " + campos[2].value.trim();
+    window.open("https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(texto), "_blank", "noopener");
+  };
+})();
+</script>
+</body>
+</html>
