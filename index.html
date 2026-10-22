@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Demo agentes IA · Nexenia</title>
+<meta name="description" content="Mira en 2 minutos cómo un agente de IA atiende a tus clientes por WhatsApp, Instagram y web: citas, ventas y seguimiento 24/7.">
+<meta property="og:title" content="Así trabajaría un agente de IA en tu negocio · Nexenia">
+<meta property="og:description" content="Demo interactiva: el agente responde, agenda citas y capta clientes mientras tú duermes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#020405;--bg-1:#06090b;--bg-2:#0a0f12;--bg-3:#10171b;
+  --c:#19f0e0;--c-2:#0db3a8;--v:#7c6cff;--wa:#25d366;
+  --fg:#f5f8f8;--fg-2:#c9d3d5;--muted:#8a979b;--dim:#5b676b;
+  --line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.14);
+  --f:"Geist","Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r:18px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 var(--f);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.mono{font-family:var(--mono)}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--c)}
+h1,h2,h3{margin:0;line-height:1.08;letter-spacing:-.025em}
+h2{font-size:clamp(30px,4.4vw,52px);font-weight:650}
+.lead{color:var(--fg-2);font-size:clamp(16px,1.6vw,19px);max-width:60ch}
+.grad{background:linear-gradient(100deg,var(--c) 10%,var(--v) 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
+section{position:relative;padding:110px 0}
+.sec-head{display:grid;gap:16px;margin-bottom:48px;max-width:760px}
+
+/* nav */
+nav{position:fixed;inset:0 0 auto;z-index:50;transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
+nav.solid{background:rgba(2,4,5,.78);backdrop-filter:blur(14px);border-color:var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:68px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.brand svg{width:30px;height:30px}
+.brand b{font-weight:700;font-size:16px;letter-spacing:.14em}
+.brand b i{font-style:normal;color:var(--c)}
+.btn{display:inline-flex;align-items:center;gap:10px;border:0;border-radius:999px;padding:13px 22px;font-weight:600;text-decoration:none;transition:transform .2s,box-shadow .2s,background .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn-wa{background:var(--wa);color:#04210f;box-shadow:0 10px 30px -10px rgba(37,211,102,.6)}
+.btn-ghost{background:rgba(255,255,255,.06);border:1px solid var(--line-2)}
+.btn-ghost:hover{background:rgba(255,255,255,.1)}
+.btn svg{width:18px;height:18px}
+nav .btn{padding:10px 18px;font-size:14px}
+
+/* hero */
+.hero{min-height:100vh;display:flex;align-items:center;padding:120px 0 80px;overflow:hidden}
+#orb{position:absolute;inset:0;width:100%;height:100%}
+.hero::after{content:"";position:absolute;inset:auto 0 0;height:200px;background:linear-gradient(transparent,var(--bg));pointer-events:none}
+.hero .wrap{position:relative;z-index:2;width:100%}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.hello{display:inline-flex;align-items:center;gap:10px;padding:8px 14px 8px 10px;border:1px solid var(--line-2);border-radius:999px;background:rgba(10,15,18,.6);backdrop-filter:blur(8px);font-size:14px;color:var(--fg-2);margin-bottom:26px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--wa);box-shadow:0 0 0 0 rgba(37,211,102,.7);animation:ping 2s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 9px rgba(37,211,102,0)}100%{box-shadow:0 0 0 0 rgba(37,211,102,0)}}
+.hero h1{font-size:clamp(40px,6.4vw,84px);font-weight:700;margin-bottom:24px}
+.hero .lead{margin-bottom:34px}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:38px}
+.sector-pick{display:flex;flex-wrap:wrap;gap:8px;max-width:620px}
+.sector-pick small{width:100%;color:var(--muted);font:500 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.chip{border:1px solid var(--line-2);background:rgba(10,15,18,.55);backdrop-filter:blur(6px);padding:8px 14px;border-radius:999px;font-size:14px;transition:all .2s}
+.chip:hover{border-color:var(--c);color:var(--c)}
+.chip.on{background:var(--c);color:#021514;border-color:var(--c);font-weight:600}
+.float-cards{position:relative;height:440px}
+.fc{position:absolute;display:flex;gap:12px;align-items:center;padding:13px 16px;border-radius:16px;background:rgba(16,23,27,.72);border:1px solid var(--line-2);backdrop-filter:blur(12px);box-shadow:0 20px 50px -20px rgba(0,0,0,.8);font-size:14px;animation:bob 6s ease-in-out infinite;white-space:nowrap}
+.fc b{display:block;font-weight:600}
+.fc span{color:var(--muted);font-size:12.5px}
+.fc .ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:19px;background:rgba(25,240,224,.12)}
+.fc:nth-child(1){top:4%;left:8%}
+.fc:nth-child(2){top:36%;right:0;animation-delay:-2s}
+.fc:nth-child(3){bottom:16%;left:0;animation-delay:-4s}
+.fc:nth-child(4){bottom:0;right:12%;animation-delay:-1s}
+@keyframes bob{50%{transform:translateY(-14px)}}
+
+/* strip */
+.strip{padding:0;border-block:1px solid var(--line);background:var(--bg-1)}
+.strip .wrap{display:grid;grid-template-columns:repeat(4,1fr)}
+.strip div.k{padding:28px 20px;border-left:1px solid var(--line)}
+.strip div.k:first-child{border-left:0}
+.strip b{display:block;font-size:clamp(26px,3vw,38px);font-weight:650;letter-spacing:-.02em}
+.strip span{color:var(--muted);font-size:14px}
+
+/* demo */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+.tab{display:flex;align-items:center;gap:10px;border:1px solid var(--line-2);background:var(--bg-2);padding:12px 18px;border-radius:14px;font-weight:550;transition:all .2s}
+.tab small{display:block;font-weight:400;color:var(--muted);font-size:12.5px}
+.tab .n{font:500 12px var(--mono);color:var(--dim)}
+.tab:hover{border-color:rgba(25,240,224,.5)}
+.tab.on{border-color:var(--c);background:linear-gradient(135deg,rgba(25,240,224,.14),rgba(124,108,255,.1))}
+.tab.on .n{color:var(--c)}
+.tab.try{border-style:dashed}
+.stage{display:grid;grid-template-columns:auto 1fr;gap:36px;align-items:start}
+.scene-note{grid-column:1/-1;color:var(--muted);font-size:14px;margin-top:-8px}
+
+.phone{width:350px;height:680px;border-radius:48px;padding:11px;background:linear-gradient(145deg,#2a3338,#0c1114);box-shadow:0 0 0 1px rgba(255,255,255,.08),0 40px 90px -30px rgba(25,240,224,.25),0 30px 60px -20px rgba(0,0,0,.9);position:relative}
+.screen{height:100%;border-radius:38px;overflow:hidden;background:#0b141a;display:flex;flex-direction:column;position:relative}
+.notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:96px;height:26px;border-radius:20px;background:#000;z-index:3}
+.ph-top{padding:44px 14px 10px;background:#1f2c34;display:flex;align-items:center;gap:10px}
+.ph-top .av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:19px;background:linear-gradient(135deg,var(--c),var(--v))}
+.ph-top b{display:block;font-size:15px;font-weight:600;line-height:1.2;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ph-top span{font-size:12px;color:#8fd9b0}
+.ph-top .chan{margin-left:auto;font:500 10px var(--mono);letter-spacing:.06em;padding:4px 8px;border-radius:8px;background:rgba(255,255,255,.08);color:var(--fg-2)}
+.chat{flex:1;overflow-y:auto;padding:14px 10px 10px;display:flex;flex-direction:column;gap:6px;scroll-behavior:smooth;
+  background-image:radial-gradient(rgba(255,255,255,.035) 1px,transparent 1px);background-size:18px 18px}
+.chat::-webkit-scrollbar{width:0}
+.b{max-width:82%;padding:7px 10px 6px;border-radius:10px;font-size:14px;line-height:1.42;position:relative;animation:pop .28s cubic-bezier(.2,.9,.3,1.3) both;white-space:pre-line;overflow-wrap:anywhere}
+.b time{display:block;text-align:right;font-size:10.5px;color:rgba(255,255,255,.5);margin-top:2px}
+.b.a{align-self:flex-start;background:#202c33;border-top-left-radius:3px}
+.b.c{align-self:flex-end;background:#005c4b;border-top-right-radius:3px}
+.b.c time::after{content:" ✓✓";color:#53bdeb}
+.b.a .ai{display:inline-block;font:600 9.5px var(--mono);letter-spacing:.08em;color:var(--c);margin-bottom:2px}
+.sys{align-self:center;font-size:11.5px;color:#c9d3d5;background:#182229;padding:5px 11px;border-radius:8px;margin:6px 0;text-align:center;max-width:90%;animation:pop .3s both}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.96)}}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-start;max-width:90%;animation:pop .3s both}
+.chips button{background:transparent;border:1px solid rgba(25,240,224,.45);color:var(--c);border-radius:999px;padding:5px 12px;font-size:13px;transition:all .2s}
+.chips button:hover:not(:disabled){background:rgba(25,240,224,.12)}
+.chips button.sel{background:var(--c);color:#021514}
+.chips button:disabled{opacity:.45;cursor:default}
+.chips button.sel:disabled{opacity:1}
+.typing{align-self:flex-start;background:#202c33;border-radius:10px;padding:10px 13px;display:flex;gap:4px}
+.typing i{width:6px;height:6px;border-radius:50%;background:#8a979b;animation:ty 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes ty{30%{transform:translateY(-4px);opacity:1}0%,60%,100%{opacity:.4}}
+.ph-bot{display:flex;gap:8px;padding:8px 10px 18px;background:#0b141a}
+.ph-bot input{flex:1;min-width:0;border:0;border-radius:22px;background:#202c33;color:var(--fg);padding:11px 15px;font:inherit;font-size:14px;outline:none}
+.ph-bot input:disabled{opacity:.55}
+.ph-bot button{width:42px;height:42px;border-radius:50%;border:0;background:#00a884;display:grid;place-items:center;flex:none}
+.ph-bot button:disabled{opacity:.4}
+.ph-bot svg{width:18px;height:18px}
+.replay{align-self:center;margin:10px 0 4px;display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;border:1px solid var(--line-2);background:rgba(16,23,27,.92);backdrop-filter:blur(8px);font-size:13px;z-index:4}
+.replay{animation:pop .3s both}
+
+/* panel */
+.panel{background:linear-gradient(180deg,var(--bg-2),var(--bg-1));border:1px solid var(--line);border-radius:24px;padding:22px;display:grid;gap:18px;min-width:0}
+.p-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.p-head h3{font-size:18px;font-weight:600}
+.p-head .live{display:inline-flex;align-items:center;gap:8px;font:500 11.5px var(--mono);color:#8fd9b0;padding:5px 10px;border-radius:999px;background:rgba(37,211,102,.1)}
+.p-head .ghost{margin-left:auto;border:1px solid var(--line-2);background:transparent;border-radius:10px;padding:6px 12px;font-size:13px;color:var(--fg-2)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat{background:var(--bg-3);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.stat b{display:block;font-size:24px;font-weight:650;letter-spacing:-.02em;transition:color .3s}
+.stat b.bump{color:var(--c);animation:bump .5s}
+@keyframes bump{40%{transform:scale(1.18)}}
+.stat span{font-size:12px;color:var(--muted)}
+.p-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.box{background:var(--bg-3);border:1px solid var(--line);border-radius:16px;padding:14px;min-width:0}
+.box h4{margin:0 0 10px;font:500 11.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between}
+.agenda{display:grid;gap:6px}
+.appt{display:grid;grid-template-columns:48px 1fr;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.03);border-left:3px solid var(--dim);font-size:13.5px;transition:all .4s}
+.appt .t{font:500 12.5px var(--mono);color:var(--fg-2)}
+.appt b{font-weight:550;display:block;line-height:1.25}
+.appt small{color:var(--muted);font-size:12px}
+.appt.new{border-left-color:var(--c);background:rgba(25,240,224,.08);animation:slide .5s both}
+.appt.gone{opacity:.35;text-decoration:line-through;border-left-color:#ff6b6b}
+@keyframes slide{from{opacity:0;transform:translateX(-12px)}}
+.feed{display:grid;gap:8px;max-height:262px;overflow-y:auto}
+.feed::-webkit-scrollbar{width:0}
+.ev{display:grid;grid-template-columns:26px 1fr;gap:8px;font-size:13px;color:var(--fg-2);animation:slide .4s both;line-height:1.4}
+.ev .i{font-size:15px}
+.ev time{display:block;font:11px var(--mono);color:var(--dim)}
+.empty{color:var(--dim);font-size:13px}
+.lead-card{display:none;padding:14px;border-radius:16px;border:1px solid rgba(124,108,255,.45);background:linear-gradient(135deg,rgba(124,108,255,.14),rgba(25,240,224,.06));animation:slide .5s both}
+.lead-card.show{display:block}
+.lead-card .row{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.lead-card b{font-size:16px}
+.tag{font:600 11px var(--mono);padding:4px 8px;border-radius:8px;background:rgba(255,107,107,.15);color:#ff9b9b}
+.lead-card dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:10px 0 0;font-size:13px}
+.lead-card dt{color:var(--muted)}
+.lead-card dd{margin:0;color:var(--fg)}
+.toast{position:absolute;top:58px;left:12px;right:12px;padding:10px 12px;border-radius:16px;background:rgba(32,44,51,.96);backdrop-filter:blur(10px);font-size:12.5px;display:flex;gap:10px;align-items:center;z-index:5;opacity:0;transform:translateY(-160%);transition:transform .45s cubic-bezier(.2,.9,.3,1.2),opacity .3s;box-shadow:0 12px 30px -10px #000}
+.toast.show{transform:none;opacity:1}
+.toast .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:var(--wa);flex:none}
+.toast b{display:block;font-size:12px}
+
+/* agents */
+.agents{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.agent{position:relative;padding:28px;border-radius:24px;border:1px solid var(--line);background:var(--bg-2);overflow:hidden;transition:transform .35s,border-color .35s;transform-style:preserve-3d}
+.agent:hover{border-color:rgba(25,240,224,.4)}
+.agent::before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;filter:blur(70px);opacity:.25;top:-100px;right:-80px;background:var(--glow,var(--c))}
+.agent .ic{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:26px;background:rgba(255,255,255,.05);border:1px solid var(--line-2);margin-bottom:22px}
+.agent h3{font-size:23px;font-weight:620;margin-bottom:10px}
+.agent p{color:var(--fg-2);margin:0 0 18px;font-size:15px}
+.agent ul{list-style:none;margin:0 0 22px;padding:0;display:grid;gap:9px;font-size:14.5px}
+.agent li{display:flex;gap:10px;color:var(--fg-2)}
+.agent li::before{content:"";flex:none;width:16px;height:16px;margin-top:3px;border-radius:50%;background:radial-gradient(circle,var(--c) 30%,rgba(25,240,224,.18) 32%)}
+.agent .go{background:none;border:0;padding:0;color:var(--c);font-weight:600;font-size:14.5px}
+
+/* calc */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
+.card{border:1px solid var(--line);background:var(--bg-2);border-radius:24px;padding:30px}
+.field{margin-bottom:26px}
+.field label{display:flex;justify-content:space-between;font-size:15px;color:var(--fg-2);margin-bottom:12px}
+.field label b{font:500 15px var(--mono);color:var(--c)}
+input[type=range]{width:100%;appearance:none;-webkit-appearance:none;height:6px;border-radius:6px;background:linear-gradient(90deg,var(--c) var(--p,50%),#1c262b var(--p,50%));outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:4px solid var(--c);cursor:pointer;box-shadow:0 0 0 6px rgba(25,240,224,.15)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:4px solid var(--c);cursor:pointer}
+.res{background:radial-gradient(120% 100% at 100% 0,rgba(124,108,255,.22),transparent 60%),radial-gradient(100% 100% at 0 100%,rgba(25,240,224,.16),transparent 60%),var(--bg-2);display:flex;flex-direction:column;justify-content:center;gap:22px}
+.res .big{font-size:clamp(46px,6vw,76px);font-weight:700;letter-spacing:-.04em;line-height:1}
+.res .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.res .row3 div{border-top:1px solid var(--line-2);padding-top:12px}
+.res .row3 b{display:block;font-size:24px;font-weight:650}
+.res .row3 span{font-size:13px;color:var(--muted)}
+.fine{font-size:12.5px;color:var(--dim)}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;counter-reset:s}
+.step{padding:28px;border-radius:24px;border:1px solid var(--line);background:var(--bg-1);position:relative}
+.step::before{counter-increment:s;content:"0" counter(s);font:500 13px var(--mono);color:var(--c);display:block;margin-bottom:40px}
+.step h3{font-size:21px;font-weight:600;margin-bottom:10px}
+.step p{margin:0;color:var(--fg-2);font-size:15px}
+.step .when{position:absolute;top:26px;right:26px;font:500 12px var(--mono);color:var(--muted);padding:4px 9px;border:1px solid var(--line-2);border-radius:999px}
+
+/* price */
+.price{display:grid;grid-template-columns:1.1fr .9fr;gap:20px}
+.pcard{border-radius:28px;padding:36px;border:1px solid rgba(25,240,224,.35);background:radial-gradient(90% 120% at 100% 0,rgba(25,240,224,.13),transparent 60%),var(--bg-2);position:relative;overflow:hidden}
+.pcard .amt{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:18px 0 6px}
+.pcard .amt b{font-size:clamp(48px,6vw,72px);font-weight:700;letter-spacing:-.04em;line-height:1}
+.pcard .amt span{color:var(--fg-2);font-size:17px}
+.pcard .plus{color:var(--muted);margin-bottom:26px}
+.pcard ul{list-style:none;padding:0;margin:0 0 30px;display:grid;gap:11px}
+.pcard li{display:flex;gap:10px;color:var(--fg-2)}
+.pcard li::before{content:"✓";color:var(--c);font-weight:700}
+.faq{display:grid;gap:10px}
+details{border:1px solid var(--line);border-radius:18px;background:var(--bg-1);padding:18px 22px;transition:border-color .2s}
+details[open]{border-color:var(--line-2)}
+summary{cursor:pointer;font-weight:560;list-style:none;display:flex;justify-content:space-between;gap:12px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--c);font:400 22px/1 var(--mono);transition:transform .25s}
+details[open] summary::after{transform:rotate(45deg)}
+details p{margin:12px 0 0;color:var(--fg-2);font-size:15px}
+
+/* final */
+.final{text-align:center;overflow:hidden}
+.final .glow{position:absolute;inset:auto 0 -300px;margin:auto;width:900px;max-width:100%;height:600px;border-radius:50%;background:radial-gradient(closest-side,rgba(25,240,224,.22),rgba(124,108,255,.12),transparent);pointer-events:none}
+.final h2{font-size:clamp(34px,5.6vw,68px);max-width:16ch;margin:18px auto 22px}
+.final .lead{margin:0 auto 34px}
+.final .hero-cta{justify-content:center}
+footer{border-top:1px solid var(--line);padding:30px 0;color:var(--dim);font-size:13.5px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+
+/* link builder (?crear=1) */
+#builder{position:fixed;right:16px;bottom:16px;z-index:80;width:min(360px,calc(100vw - 32px));padding:18px;border-radius:18px;background:rgba(16,23,27,.97);border:1px solid var(--c);box-shadow:0 30px 60px -20px #000;display:none;font-size:14px}
+#builder.show{display:grid;gap:10px}
+#builder input,#builder select{width:100%;padding:9px 11px;border-radius:10px;border:1px solid var(--line-2);background:var(--bg);color:var(--fg);font:inherit;font-size:14px}
+#builder textarea{width:100%;height:76px;padding:9px 11px;border-radius:10px;border:1px solid var(--line-2);background:var(--bg);color:var(--c);font:12px/1.4 var(--mono);resize:vertical}
+#builder .btn{justify-content:center;padding:10px}
+
+@media (max-width:1000px){
+  .hero-grid{grid-template-columns:1fr}
+  .float-cards{display:none}
+  #orb{opacity:.45}
+  .stage{grid-template-columns:1fr;justify-items:center}
+  .panel{width:100%}
+  .agents,.steps{grid-template-columns:1fr}
+  .calc,.price{grid-template-columns:1fr}
+  .strip .wrap{grid-template-columns:repeat(2,1fr)}
+  .strip div.k:nth-child(3){border-left:0}
+  .strip div.k:nth-child(n+3){border-top:1px solid var(--line)}
+}
+@media (max-width:620px){
+  section{padding:80px 0}
+  .wrap{padding:0 16px}
+  .phone{width:100%;max-width:350px;height:640px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .p-cols{grid-template-columns:1fr}
+  .tab{flex:1 1 calc(50% - 8px);padding:10px 12px;font-size:14px}
+  .tab small{display:none}
+  nav .btn span{display:none}
+  .res .row3{grid-template-columns:1fr 1fr}
+  .card,.pcard{padding:24px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  .rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="wrap">
+    <a class="brand" href="#inicio" aria-label="Nexenia">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#19f0e0"/><stop offset="1" stop-color="#7c6cff"/></linearGradient></defs><path d="M6 26V6l20 20V6" fill="none" stroke="url(#lg)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="6" r="2.6" fill="#19f0e0"/><circle cx="26" cy="26" r="2.6" fill="#7c6cff"/></svg>
+      <b>NE<i>X</i>EN<i>IA</i></b>
+    </a>
+    <a class="btn btn-wa js-wa" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.4-.7-2.8-1.1-4.6-4-4.8-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z"/></svg><span>Quiero el mío</span></a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="inicio">
+  <canvas id="orb" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="hello rv"><span class="dot"></span><span id="helloTxt">Demo preparada para tu negocio</span></div>
+        <h1 class="rv"><span id="h1a">Tu negocio atendiendo</span><br><span class="grad">24 horas. Sin ti.</span></h1>
+        <p class="lead rv" id="heroLead">Un agente de inteligencia artificial que contesta al momento por WhatsApp, Instagram y tu web, agenda citas, cierra ventas y hace el seguimiento. Mira en 2 minutos cómo trabajaría.</p>
+        <div class="hero-cta rv">
+          <a class="btn btn-wa" href="#demo">▶ Ver la demo en vivo</a>
+          <a class="btn btn-ghost" href="#calculadora">¿Cuánto me haría ganar?</a>
+        </div>
+        <div class="sector-pick rv" id="sectorPick"><small>Elige tu sector</small></div>
+      </div>
+      <div class="float-cards" aria-hidden="true">
+        <div class="fc"><div class="ic">🗓️</div><div><b>Cita creada · 23:47</b><span id="fc1">Mechas · sábado 12:00</span></div></div>
+        <div class="fc"><div class="ic">⚡</div><div><b>Respondido en 4 s</b><span>Domingo, 02:13</span></div></div>
+        <div class="fc"><div class="ic">🔥</div><div><b>Cliente interesado</b><span>Te llama mañana a las 10:00</span></div></div>
+        <div class="fc"><div class="ic">⭐</div><div><b>Nueva reseña 5★</b><span>Google · pedida por el agente</span></div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="strip">
+  <div class="wrap">
+    <div class="k rv"><b class="grad">24/7</b><span>También festivos y de madrugada</span></div>
+    <div class="k rv"><b>&lt; 5 s</b><span>Tiempo de respuesta</span></div>
+    <div class="k rv"><b>3 canales</b><span>WhatsApp, Instagram y web</span></div>
+    <div class="k rv"><b>0 mensajes</b><span>sin contestar</span></div>
+  </div>
+</div>
+
+<!-- DEMO -->
+<section id="demo">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Demo en vivo</span>
+      <h2>Míralo trabajar con <span class="grad" id="demoNeg">tus clientes</span></h2>
+      <p class="lead">A la izquierda, el móvil de tu cliente. A la derecha, lo que ves tú: la agenda se llena sola y te avisa de lo importante. Elige un agente o escríbele tú mismo.</p>
+    </div>
+    <div class="tabs rv" id="tabs" role="tablist">
+      <button class="tab on" data-s="rec" role="tab"><span class="n">01</span><span>Recepcionista<small>Citas y reservas</small></span></button>
+      <button class="tab" data-s="ven" role="tab"><span class="n">02</span><span>Comercial<small>Capta clientes</small></span></button>
+      <button class="tab" data-s="seg" role="tab"><span class="n">03</span><span>Seguimiento<small>Recordatorios y reseñas</small></span></button>
+      <button class="tab try" data-s="try" role="tab"><span class="n">✍️</span><span>Pruébalo tú<small>Escríbele como un cliente</small></span></button>
+    </div>
+    <div class="stage">
+      <div class="phone rv">
+        <div class="screen">
+          <div class="notch"></div>
+          <div class="toast" id="toast"><div class="ic">💬</div><div><b id="toastT">Nexenia · aviso</b><span id="toastB"></span></div></div>
+          <div class="ph-top">
+            <div class="av" id="phAv">✂️</div>
+            <div><b id="phName">Tu negocio</b><span id="phSub">en línea · responde al instante</span></div>
+            <span class="chan" id="phChan">WHATSAPP</span>
+          </div>
+          <div class="chat" id="chat" aria-live="polite"></div>
+          <form class="ph-bot" id="form">
+            <input id="inp" placeholder="Mensaje" autocomplete="off" disabled>
+            <button id="send" disabled aria-label="Enviar"><svg viewBox="0 0 24 24" fill="#fff"><path d="M3 20.5 21 12 3 3.5 3 10l12 2-12 2z"/></svg></button>
+          </form>
+        </div>
+      </div>
+      <div class="panel rv">
+        <div class="p-head">
+          <h3 id="pTitle">Panel de tu negocio</h3>
+          <span class="live"><span class="dot"></span>AGENTE ACTIVO</span>
+          <button class="ghost" id="restart">↻ Reiniciar</button>
+        </div>
+        <div class="stats">
+          <div class="stat"><b id="sConv">14</b><span>Conversaciones hoy</span></div>
+          <div class="stat"><b id="sCit">6</b><span id="sCitL">Citas creadas</span></div>
+          <div class="stat"><b id="sLead">2</b><span>Clientes potenciales</span></div>
+          <div class="stat"><b id="sRev">4,8★</b><span id="sRevL">Reseñas · 37</span></div>
+        </div>
+        <div class="lead-card" id="leadCard">
+          <div class="row"><b id="lcName">—</b><span class="tag">🔥 INTERÉS ALTO</span></div>
+          <dl>
+            <dt>Canal</dt><dd id="lcChan">Instagram</dd>
+            <dt>Quiere</dt><dd id="lcWant">—</dd>
+            <dt>Valor</dt><dd id="lcVal">—</dd>
+            <dt>Siguiente</dt><dd id="lcNext">—</dd>
+          </dl>
+        </div>
+        <div class="p-cols">
+          <div class="box"><h4><span id="agTitle">Agenda · sábado</span><span id="agCount"></span></h4><div class="agenda" id="agenda"></div></div>
+          <div class="box"><h4><span>Actividad del agente</span></h4><div class="feed" id="feed"><div class="empty">Esperando mensajes…</div></div></div>
+        </div>
+      </div>
+      <p class="scene-note" id="sceneNote">Conversación de ejemplo con datos ficticios. El agente real se entrena con tus servicios, precios, horarios y forma de hablar.</p>
+    </div>
+  </div>
+</section>
+
+<!-- AGENTS -->
+<section id="agentes" style="background:var(--bg-1);border-block:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Tu equipo digital</span>
+      <h2>Tres agentes. <span class="grad">Cero sueldos extra.</span></h2>
+      <p class="lead">Empieza con uno y añade los demás cuando quieras. Todos hablan como tu negocio y te pasan la conversación cuando hace falta una persona.</p>
+    </div>
+    <div class="agents">
+      <article class="agent rv tilt" style="--glow:var(--c)">
+        <div class="ic">🗓️</div>
+        <h3>Recepcionista 24/7</h3>
+        <p>Contesta en segundos y llena tu agenda mientras trabajas, comes o duermes.</p>
+        <ul><li>Responde precios, horarios y dudas</li><li>Ofrece huecos libres y agenda la cita</li><li>Te avisa al móvil de cada reserva</li></ul>
+        <button class="go" data-go="rec">Verlo en acción →</button>
+      </article>
+      <article class="agent rv tilt" style="--glow:var(--v)">
+        <div class="ic">🔥</div>
+        <h3>Comercial que no se cansa</h3>
+        <p>Detecta a quien quiere comprar, le hace las preguntas correctas y te lo deja listo para cerrar.</p>
+        <ul><li>Cualifica: qué quiere, cuándo y presupuesto</li><li>Recoge nombre y teléfono</li><li>Te pasa el cliente con todo apuntado</li></ul>
+        <button class="go" data-go="ven">Verlo en acción →</button>
+      </article>
+      <article class="agent rv tilt" style="--glow:#25d366">
+        <div class="ic">⭐</div>
+        <h3>Seguimiento y reseñas</h3>
+        <p>Menos clientes que no se presentan, más reseñas y más clientes que vuelven.</p>
+        <ul><li>Recordatorios y cambios de cita</li><li>Rellena huecos con la lista de espera</li><li>Pide reseñas y recupera clientes dormidos</li></ul>
+        <button class="go" data-go="seg">Verlo en acción →</button>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- CALC -->
+<section id="calculadora">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Calculadora</span>
+      <h2>¿Cuánto dinero se te escapa <span class="grad">por no contestar?</span></h2>
+      <p class="lead">Mueve los valores con los datos de tu negocio.</p>
+    </div>
+    <div class="calc">
+      <div class="card rv">
+        <div class="field"><label>Mensajes y consultas al día <b id="vMsg">10</b></label><input type="range" id="rMsg" min="2" max="80" value="10"></div>
+        <div class="field"><label>% que se contestan tarde o nunca <b id="vPct">25 %</b></label><input type="range" id="rPct" min="5" max="70" value="25"></div>
+        <div class="field"><label>Lo que gasta un cliente de media <b id="vTk">40 €</b></label><input type="range" id="rTk" min="10" max="400" step="5" value="40"></div>
+        <div class="field" style="margin:0"><label>De esos, cuántos acabarían comprando <b id="vCv">30 %</b></label><input type="range" id="rCv" min="5" max="70" value="30"></div>
+      </div>
+      <div class="card res rv">
+        <span class="eyebrow">Podrías recuperar cada mes</span>
+        <div class="big grad" id="oEur">0 €</div>
+        <div class="row3">
+          <div><b id="oCli">0</b><span>clientes más</span></div>
+          <div><b id="oHrs">0 h</b><span>de móvil ahorradas</span></div>
+          <div><b id="oRoi">0×</b><span>lo que cuesta el agente</span></div>
+        </div>
+        <p class="fine">Estimación orientativa: mensajes al mes × % sin respuesta × % que compraría × gasto medio, frente a la cuota de 300 €/mes. Horas: unos 3 minutos por conversación.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STEPS -->
+<section style="background:var(--bg-1);border-block:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Cómo empezamos</span>
+      <h2>Funcionando en tu negocio <span class="grad">en una semana</span></h2>
+    </div>
+    <div class="steps">
+      <div class="step rv"><span class="when">30 min</span><h3>Nos cuentas tu negocio</h3><p>Una llamada o un WhatsApp: servicios, precios, horarios, preguntas que te hacen siempre y cómo te gusta hablar a tus clientes.</p></div>
+      <div class="step rv"><span class="when">Días 1–5</span><h3>Lo entrenamos y lo pruebas</h3><p>Configuramos el agente con tu información y lo pruebas tú antes que nadie. Ajustamos hasta que conteste como lo harías tú.</p></div>
+      <div class="step rv"><span class="when">Día 7</span><h3>Lo conectamos y a trabajar</h3><p>Lo enchufamos a tus canales y empiezas a recibir avisos de citas y clientes en tu móvil. Lo seguimos mejorando cada mes.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICE + FAQ -->
+<section id="precio">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Precio claro</span>
+      <h2>Menos de lo que cuesta <span class="grad">una media jornada</span></h2>
+    </div>
+    <div class="price">
+      <div class="pcard rv">
+        <span class="eyebrow">Agente de IA para tu negocio</span>
+        <div class="amt"><b>300 €</b><span>/ mes</span></div>
+        <div class="plus">+ 500 € de puesta en marcha · precios + IVA</div>
+        <ul>
+          <li>Entrenado con los servicios, precios y horarios de tu negocio</li>
+          <li>Atiende en tus canales: WhatsApp, Instagram o web</li>
+          <li>Avisos al móvil de citas y clientes interesados</li>
+          <li>Te pasa la conversación cuando hace falta una persona</li>
+          <li>Mantenimiento, ajustes y soporte de Nexenia</li>
+        </ul>
+        <a class="btn btn-wa js-wa" href="#" target="_blank" rel="noopener">💬 Quiero probarlo en mi negocio</a>
+      </div>
+      <div class="faq rv">
+        <details open><summary>¿Va a sonar a robot?</summary><p>No. Lo configuramos con tu forma de hablar: si tuteas, si usas emojis, cómo saludas. La mayoría de clientes no nota la diferencia; y si alguien pregunta, puede decir que es el asistente del negocio.</p></details>
+        <details><summary>¿Y si le preguntan algo que no sabe?</summary><p>No se inventa nada. Si no tiene la respuesta, toma nota y te pasa la conversación a ti, con aviso al móvil, para que contestes cuando puedas.</p></details>
+        <details><summary>¿Tengo que saber de tecnología?</summary><p>Nada. Nosotros lo montamos, lo conectamos y lo mantenemos. Tú solo recibes los avisos y miras tu agenda.</p></details>
+        <details><summary>¿Puedo cambiar precios o servicios después?</summary><p>Sí. Nos escribes y lo actualizamos. Los cambios están incluidos en la cuota mensual.</p></details>
+        <details><summary>¿Sirve para mi tipo de negocio?</summary><p>Si recibes mensajes de clientes, sí: peluquerías, estética, clínicas, restaurantes, tiendas, talleres, inmobiliarias… Esta demo cambia según el sector que elijas arriba.</p></details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL -->
+<section class="final">
+  <div class="glow"></div>
+  <div class="wrap" style="position:relative">
+    <span class="eyebrow">Nexenia · Inteligencia artificial para pymes</span>
+    <h2 id="finalH">¿Lo ponemos a trabajar en <span class="grad">tu negocio</span>?</h2>
+    <p class="lead">Escríbenos por WhatsApp y te preparamos una prueba con la información real de tu negocio. Sin compromiso.</p>
+    <div class="hero-cta">
+      <a class="btn btn-wa js-wa" href="#" target="_blank" rel="noopener">💬 WhatsApp 642 375 023</a>
+      <a class="btn btn-ghost" href="tel:+34642375023">📞 Llamar</a>
+    </div>
+    <p class="fine">Atención L–V 9:00–20:00 · S 9:00–13:00</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="yr"></span> Nexenia · Almería · Trabajamos con pymes de toda España en remoto</span>
+    <span>Demo con conversaciones y datos de ejemplo</span>
+  </div>
+</footer>
+
+<div id="builder">
+  <b>Crear enlace personalizado</b>
+  <input id="bNeg" placeholder="Nombre del negocio (p. ej. La Pelu de Vic)">
+  <select id="bSec"></select>
+  <textarea id="bOut" readonly></textarea>
+  <button class="btn btn-wa" id="bCopy" type="button">Copiar mensaje con enlace</button>
+  <small class="fine" id="bNote"></small>
+</div>
+
+<script>
+(()=>{
+'use strict';
+const WA = '34642375023';
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const el = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const eur = n => n.toLocaleString('es-ES', {maximumFractionDigits:0}) + ' €';
+const priceTxt = (p, per) => p === 0 ? 'gratis' : eur(p) + (per || '');
+
+/* ---------- Sectores ---------- */
+const S = {
+  peluqueria:{label:'Peluquería',icon:'✂️',neg:'Tu Peluquería',cita:'cita',citas:'Citas creadas',staff:['Laura','Marta'],ticket:40,cv:30,
+    svc:[['Corte y peinado',45,22],['Mechas / balayage',150,75],['Color de raíz',75,35],['Recogido',60,40]],
+    rec:{cli:'Sara',q:'Holaa! tenéis hueco para unas mechas este sábado? cuánto cuestan?',a:'¡Hola Sara! 😊 Las mechas tipo balayage son 75 € y se tarda unas 2 h y media. Este sábado me quedan estos huecos:',slots:['09:00','12:00','16:30'],pick:1,s:1,
+      conf:'¡Listo! ✅ Sara, mechas el sábado a las 12:00 con Laura. Te recuerdo el día antes por aquí.\nSi tienes foto del tono que te gusta, mándamela y se la paso 💛'},
+    ven:{cli:'Lucía',ape:'Gómez',q:'Hola! me caso en junio y quería info del recogido de novia con prueba',a:'¡Enhorabuena, Lucía! 💍 El pack novia incluye prueba previa + peinado el día de la boda. ¿Para cuántas personas sería (madre, hermanas…)? Así te preparo un presupuesto cerrado.',r:'Seríamos 3: yo, mi madre y mi hermana',want:'Pack novia · 3 personas · junio',val:260},
+    seg:{cli:'Carmen',s:0}},
+  barberia:{label:'Barbería',icon:'💈',neg:'Tu Barbería',cita:'cita',citas:'Citas creadas',staff:['Dani','Rubén'],ticket:18,cv:35,
+    svc:[['Corte',30,15],['Corte + barba',45,22],['Arreglo de barba',20,10],['Afeitado clásico',30,18]],
+    rec:{cli:'Javi',q:'buenas, este sábado tenéis para corte y barba?',a:'¡Buenas, Javi! 💈 Corte + barba son 22 € (unos 45 min). El sábado tengo libre:',slots:['10:30','12:00','17:15'],pick:2,s:1,
+      conf:'Hecho ✅ Javi, corte + barba el sábado a las 17:15 con Dani. Si te surge algo, avísame por aquí y te lo cambio.'},
+    ven:{cli:'Álex',ape:'Martín',q:'Buenas, somos 4 amigos y queremos ir juntos antes de una boda el viernes, podéis?',a:'¡Claro, Álex! Os cogemos seguidos con los dos barberos para que salgáis a la vez 🙌 ¿Corte + barba para los 4?',r:'Sí, los 4 corte y barba',want:'Grupo de 4 · corte + barba · viernes',val:88},
+    seg:{cli:'Pedro',s:0}},
+  unas:{label:'Uñas y estética',icon:'💅',neg:'Tu Centro de Uñas',cita:'cita',citas:'Citas creadas',staff:['Noelia','Cris'],ticket:30,cv:35,
+    svc:[['Semipermanente',45,18],['Uñas de gel',90,35],['Relleno de gel',75,28],['Pedicura completa',60,30]],
+    rec:{cli:'Andrea',q:'holaa, hay hueco el sábado para uñas de gel? cuánto es?',a:'¡Hola Andrea! 💅 Las uñas de gel son 35 € (1 h y media aprox.). El sábado me quedan:',slots:['10:00','12:00','17:30'],pick:0,s:1,
+      conf:'¡Apuntada! ✅ Andrea, uñas de gel el sábado a las 10:00 con Noelia. Si quieres un diseño concreto, mándame foto y lo tenemos preparado ✨'},
+    ven:{cli:'Paula',ape:'Ruiz',q:'Hola! vi que dais formación, cuándo empieza el próximo curso?',a:'¡Hola Paula! El próximo curso de uñas de gel empieza el 4 de noviembre, con plazas limitadas a 6 ✨ ¿Tienes ya experiencia o empezarías desde cero?',r:'Desde cero, pero me encanta',want:'Curso de gel · nivel inicial',val:290},
+    seg:{cli:'Marta',s:0}},
+  canina:{label:'Peluquería canina',icon:'🐶',neg:'Tu Peluquería Canina',cita:'cita',citas:'Citas creadas',staff:['Irene','Pablo'],ticket:35,cv:35,
+    svc:[['Baño y secado',60,25],['Baño + corte',90,38],['Corte de uñas',15,8],['Deslanado',90,40]],
+    rec:{cli:'Marina',q:'Hola! tenéis hueco el sábado para baño y corte? es una caniche pequeñita',a:'¡Hola Marina! 🐩 Baño + corte para caniche pequeña son 38 € (1 h y media). Este sábado puedo ofrecerte:',slots:['09:30','12:00','16:00'],pick:0,s:1,
+      conf:'¡Reservado! ✅ Sábado a las 09:30 con Irene. Si es su primera vez, avísanos y le dedicamos un ratito extra para que se acostumbre 🐾'},
+    ven:{cli:'Jorge',ape:'Navarro',q:'Hola, tengo dos golden y quería saber si hacéis precio por llevarlos los dos cada mes',a:'¡Hola Jorge! 🐕🐕 Sí, tenemos bono mensual para 2 perros con descuento. ¿Les toca deslanado o solo baño?',r:'Deslanado, sueltan muchísimo pelo',want:'Bono mensual · 2 golden · deslanado',val:68},
+    seg:{cli:'Lola',s:0}},
+  tatuajes:{label:'Tatuajes',icon:'🖋️',neg:'Tu Estudio de Tatuajes',cita:'cita',citas:'Citas creadas',staff:['Vera','Kike'],ticket:120,cv:25,
+    svc:[['Tatuaje pequeño',60,60],['Tatuaje mediano',180,150],['Sesión de día completo',360,350],['Piercing',20,30]],
+    rec:{cli:'Nerea',q:'Hola! quiero hacerme un tatuaje pequeñito en la muñeca, tenéis cita el sábado?',a:'¡Hola Nerea! 🖋️ Un tatuaje pequeño parte de 60 € (1 h aprox.). Este sábado Vera tiene libre:',slots:['11:00','13:00','17:00'],pick:0,s:0,
+      conf:'¡Cita confirmada! ✅ Sábado a las 11:00 con Vera. Mándame por aquí la idea o una referencia y te prepara el boceto antes ✍️'},
+    ven:{cli:'Marcos',ape:'Vidal',q:'Buenas, quiero un brazo completo estilo japonés, cuánto podría costar?',a:'¡Proyectazo, Marcos! 🐉 Un brazo completo suele ir por sesiones de día completo (350 € cada una). ¿Tienes ya referencias o lo diseñamos desde cero con Kike?',r:'Tengo algunas referencias, os las paso',want:'Brazo completo japonés · 4–5 sesiones',val:1600},
+    seg:{cli:'Iván',s:0}},
+  restaurante:{label:'Restaurante',icon:'🍽️',neg:'Tu Restaurante',cita:'reserva',citas:'Reservas creadas',staff:['Sala','Sala'],per:' /persona',ticket:60,cv:35,
+    svc:[['Menú del día',60,14],['Cena a la carta',90,32],['Menú degustación',120,55],['Menú de grupo',150,30]],
+    rec:{cli:'Sergio',q:'Hola! tenéis mesa para 4 este sábado por la noche?',a:'¡Hola Sergio! 🍽️ Sí, el sábado por la noche aún tengo mesa para 4 a estas horas:',slots:['20:30','21:00','22:15'],pick:1,s:1,
+      conf:'¡Reservado! ✅ Mesa para 4 el sábado a las 21:00. ¿Alguna alergia o intolerancia que deba saber cocina? Si preferís terraza, os la guardo 🌙'},
+    ven:{cli:'Elena',ape:'Castro',q:'Hola, queremos hacer la comida de empresa en diciembre, seríamos 25',a:'¡Hola Elena! 🎄 Tenemos menús de grupo desde 30 €/persona con zona reservada. ¿Qué fecha tenéis en mente y hay alguna alergia?',r:'El 19 de diciembre, hay 2 celíacos',want:'Comida de empresa · 25 pax · 19 dic',val:750},
+    seg:{cli:'Antonio',s:1}},
+  clinica:{label:'Clínica dental',icon:'🦷',neg:'Tu Clínica',cita:'cita',citas:'Citas creadas',staff:['la Dra. Ruiz','el Dr. Molina'],ticket:90,cv:30,
+    svc:[['Primera visita y revisión',30,0],['Limpieza dental',45,45],['Blanqueamiento',60,190],['Consulta de ortodoncia',30,0]],
+    rec:{cli:'Raúl',q:'Hola, quería pedir cita para una limpieza, el sábado abrís?',a:'¡Hola Raúl! 🦷 Sí, el sábado abrimos por la mañana. La limpieza son 45 € y dura unos 45 min. Tengo:',slots:['09:30','11:00','12:30'],pick:1,s:1,
+      conf:'Cita confirmada ✅ Raúl, limpieza el sábado a las 11:00 con la Dra. Ruiz. Te mando recordatorio el viernes. Si es tu primera visita, trae el DNI 🙂'},
+    ven:{cli:'Rosa',ape:'López',q:'Hola, cuánto cuesta la ortodoncia invisible? tengo los dientes un poco torcidos',a:'Hola Rosa 😊 Depende de cada caso; te lo valoramos en una primera consulta gratuita con escáner, y hay opciones de financiación. ¿Te viene mejor por la mañana o por la tarde?',r:'Por la tarde mejor',want:'Ortodoncia invisible · 1ª consulta gratis',val:3200},
+    seg:{cli:'Pilar',s:1}},
+  tienda:{label:'Tienda de ropa',icon:'🛍️',neg:'Tu Tienda',cita:'recogida',citas:'Ventas / reservas',staff:['Bea','Bea'],ticket:45,cv:25,
+    svc:[['Vestido midi satinado',0,49],['Chaqueta de punto',0,39],['Pantalón palazzo',0,35],['Asesoría de estilo',45,0]],
+    rec:{cli:'Clara',q:'Hola! el vestido verde que subisteis ayer lo tenéis en talla M?',a:'¡Hola Clara! 💚 Sí, me queda uno en M (49 €). Te lo aparto 48 h sin compromiso. ¿Cuándo te pasas a recogerlo el sábado?',slots:['10:30','12:00','18:00'],pick:1,s:0,
+      conf:'¡Apartado! ✅ Vestido verde talla M a tu nombre, recogida el sábado a las 12:00. Si prefieres que te lo enviemos, también hacemos envíos 📦'},
+    ven:{cli:'Sonia',ape:'Prieto',q:'Hola! busco look completo para una boda en noviembre, me podéis ayudar?',a:'¡Claro, Sonia! 😍 Tenemos asesoría de estilo gratuita. ¿Qué talla usas y tienes algún color en mente? Te preparo 3 propuestas para cuando vengas.',r:'Una 38, y me gustaría algo en azul',want:'Look boda · talla 38 · azul',val:180},
+    seg:{cli:'Eva',s:1}},
+  inmobiliaria:{label:'Inmobiliaria',icon:'🏡',neg:'Tu Inmobiliaria',cita:'visita',citas:'Visitas agendadas',staff:['Ana','Luis'],ticket:3000,cv:4,
+    svc:[['Piso 3 hab. en el centro',0,189000],['Ático con terraza',0,245000],['Alquiler 2 hab.',0,750],['Valoración de tu vivienda',30,0]],
+    rec:{cli:'Carlos',q:'Hola, me interesa el piso de 3 habitaciones del centro, sigue disponible? se puede ver?',a:'¡Hola Carlos! 🏡 Sí, sigue disponible: 3 hab., 2 baños, 98 m², 189.000 €. Puedes visitarlo este sábado a estas horas:',slots:['10:00','11:00','12:30'],pick:1,s:0,
+      conf:'Visita confirmada ✅ Carlos, sábado a las 11:00 con Ana. Te paso la ubicación exacta por aquí. ¿Necesitarías financiación? Te puedo poner en contacto con nuestro asesor hipotecario.'},
+    ven:{cli:'Teresa',ape:'Sanz',q:'Hola, quiero vender mi casa, cuánto me daríais?',a:'Hola Teresa 🏡 Te hacemos una valoración gratuita en 48 h. ¿Me dices zona, metros aproximados y si tiene garaje o terraza?',r:'Zona centro, 110 m², con terraza',want:'Captación · venta vivienda 110 m²',val:6000},
+    seg:{cli:'Manuel',s:3}},
+};
+const SECTOR_KEYS = Object.keys(S);
+function matchSector(t){
+  t = (t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  if (!t) return null;
+  if (S[t]) return t;
+  const rules = [['canin','canina'],['perro','canina'],['barber','barberia'],['una','unas'],['manicur','unas'],['estetic','unas'],['tatu','tatuajes'],['piercing','tatuajes'],['restaur','restaurante'],['bar','restaurante'],['cafe','restaurante'],['pasteler','tienda'],['florister','tienda'],['boutique','tienda'],['ropa','tienda'],['tienda','tienda'],['clinic','clinica'],['dental','clinica'],['fisio','clinica'],['inmobil','inmobiliaria'],['pelu','peluqueria']];
+  for (const [k,v] of rules) if (t.includes(k)) return v;
+  return null;
+}
+
+/* ---------- Personalización por URL ---------- */
+const P = new URLSearchParams(location.search);
+const NEG = (P.get('negocio')||'').trim().slice(0,60);
+let sec = matchSector(P.get('sector')) || 'peluqueria';
+const negName = () => NEG || S[sec].neg;
+
+function nextSaturday(){
+  const d = new Date(); const add = (6 - d.getDay() + 7) % 7 || 7; d.setDate(d.getDate()+add);
+  return d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric'});
+}
+const SAT = nextSaturday();
+
+function waLink(extra){
+  const txt = `Hola Nexenia 👋 He visto la demo de agentes de IA${NEG?` para ${NEG}`:''} y me interesa${extra?' '+extra:''}. ¿Me contáis más?`;
+  return `https://wa.me/${WA}?text=${encodeURIComponent(txt)}`;
+}
+
+function applySector(){
+  const s = S[sec];
+  $$('.chip[data-sec]').forEach(c => c.classList.toggle('on', c.dataset.sec === sec));
+  $('#phAv').textContent = s.icon;
+  $('#phName').textContent = negName();
+  $('#pTitle').textContent = 'Panel de ' + negName();
+  $('#demoNeg').textContent = NEG ? `los clientes de ${NEG}` : `los clientes de tu ${s.label.toLowerCase()}`;
+  $('#sCitL').textContent = s.citas;
+  $('#fc1').textContent = `${s.svc[s.rec.s][0]} · sábado ${s.rec.slots[s.rec.pick]}`;
+  $('#rTk').value = Math.min(400, s.ticket); $('#rCv').value = s.cv;
+  if (s.ticket > 400) { $('#rTk').max = 6000; $('#rTk').step = 100; $('#rTk').value = s.ticket; } else { $('#rTk').max = 400; $('#rTk').step = 5; }
+  calc();
+  $$('.js-wa').forEach(a => a.href = waLink(`(sector: ${s.label})`));
+}
+
+function initHero(){
+  const box = $('#sectorPick');
+  SECTOR_KEYS.forEach(k => {
+    const b = el('button','chip', `${S[k].icon} ${S[k].label}`); b.dataset.sec = k; b.type='button';
+    b.onclick = () => { sec = k; applySector(); startScene(curScene, true); };
+    box.appendChild(b);
+  });
+  if (NEG) {
+    $('#helloTxt').textContent = `Demo preparada para ${NEG}`;
+    $('#h1a').textContent = `${NEG}, atendiendo`;
+    document.title = `${NEG} · Demo agente IA · Nexenia`;
+    $('#finalH').innerHTML = '';
+    $('#finalH').append('¿Lo ponemos a trabajar en ', Object.assign(el('span','grad', NEG),{}), '?');
+  }
+  $('#yr').textContent = new Date().getFullYear();
+}
+
+/* ---------- Panel ---------- */
+const NAMES = ['Rocío','Inés','Patri','Toni','Mari','Jose','Alba','Hugo','Nuria','Rafa'];
+let agenda = [], stats = {};
+function resetPanel(scn){
+  const s = S[sec];
+  stats = {conv:14, cit:6, lead:2, rev:37};
+  setStat('sConv',stats.conv,false); setStat('sCit',stats.cit,false); setStat('sLead',stats.lead,false);
+  $('#sRev').textContent='4,8★'; $('#sRevL').textContent='Reseñas · 37';
+  $('#leadCard').classList.remove('show');
+  $('#feed').innerHTML = ''; $('#feed').append(el('div','empty','Esperando mensajes…'));
+  // agenda base: horas que no chocan con los huecos ofrecidos
+  const offered = new Set(s.rec.slots);
+  const pool = ['09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','16:00','16:30','17:00','17:15','17:30','18:00','18:30','20:30','21:00','22:15'].filter(t => !offered.has(t));
+  const times = s.cita==='reserva' ? ['13:30','14:00','14:30','20:00','21:30'] : [pool[0], pool[3], pool[6], pool[10]];
+  agenda = times.map((t,i) => ({t, who:NAMES[(i*3+sec.length)%NAMES.length], what:s.svc[(i+1)%s.svc.length][0]}));
+  if (scn === 'seg') { agenda = agenda.filter(a => a.t !== '10:30'); agenda.push({t:'10:30', who:s.seg.cli, what:s.svc[s.seg.s][0]}); }
+  $('#agTitle').textContent = 'Agenda · ' + SAT;
+  renderAgenda();
+}
+function renderAgenda(newT){
+  agenda.sort((a,b) => a.t.localeCompare(b.t));
+  const box = $('#agenda'); box.innerHTML='';
+  agenda.forEach(a => {
+    const r = el('div','appt'+(a.t===newT?' new':'')+(a.gone?' gone':''));
+    r.append(el('span','t',a.t));
+    const d = el('div'); d.append(el('b',null,a.who), el('small',null,a.what)); r.append(d);
+    box.append(r);
+  });
+  $('#agCount').textContent = agenda.filter(a=>!a.gone).length + ' ' + (S[sec].cita==='reserva'?'reservas':S[sec].cita==='visita'?'visitas':'citas');
+}
+function addAppt(t, who, what){ agenda = agenda.filter(a => a.t !== t || a.gone); agenda.push({t,who,what,isNew:true}); renderAgenda(t); }
+function cancelAppt(t){ const a = agenda.find(a => a.t===t && !a.gone); if (a) a.gone = true; renderAgenda(); }
+function setStat(id,v,bump=true){ const b=$('#'+id); b.textContent=v; if(bump){b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');} }
+function bump(k){ stats[k]++; setStat({conv:'sConv',cit:'sCit',lead:'sLead'}[k], stats[k]); }
+function log(icon, text, time){
+  const f = $('#feed'); f.querySelector('.empty')?.remove();
+  const e = el('div','ev'); e.append(el('span','i',icon));
+  const d = el('div'); d.append(el('time',null,time||clock())); d.append(document.createTextNode(text)); e.append(d);
+  f.prepend(e);
+}
+let toastT;
+function toast(title, body){
+  $('#toastT').textContent = title; $('#toastB').textContent = body;
+  $('#toast').classList.add('show'); clearTimeout(toastT); toastT = setTimeout(()=>$('#toast').classList.remove('show'), 3200);
+}
+function showLead(L){
+  $('#lcName').textContent = L.name; $('#lcChan').textContent = L.chan; $('#lcWant').textContent = L.want;
+  $('#lcVal').textContent = '≈ ' + eur(L.val); $('#lcNext').textContent = L.next;
+  const c = $('#leadCard'); c.classList.remove('show'); void c.offsetWidth; c.classList.add('show');
+}
+
+/* ---------- Chat ---------- */
+const chat = $('#chat');
+let clockBase = null;
+function clock(){ return clockBase || new Date().toTimeString().slice(0,5); }
+function scrollChat(){ chat.scrollTop = chat.scrollHeight; }
+function bubble(who, text){
+  const b = el('div','b '+who);
+  if (who==='a') b.append(el('span','ai','✦ ASISTENTE IA'), document.createElement('br'));
+  b.append(document.createTextNode(text)); b.append(el('time',null,clock()));
+  chat.append(b); scrollChat(); return b;
+}
+function sys(text){ chat.append(el('div','sys',text)); scrollChat(); }
+function chipsRow(opts, onPick){
+  const row = el('div','chips');
+  opts.forEach(o => { const b = el('button',null,o); b.type='button'; b.disabled = !onPick; if(onPick) b.onclick = () => { [...row.children].forEach(x=>x.disabled=true); b.classList.add('sel'); onPick(o); }; row.append(b); });
+  chat.append(row); scrollChat(); return row;
+}
+async function typing(ms, tok){
+  const t = el('div','typing'); t.append(el('i'),el('i'),el('i')); chat.append(t); scrollChat();
+  await sleep(ms); t.remove(); return tok === runId;
+}
+
+/* ---------- Escenarios ---------- */
+function steps(scn){
+  const s = S[sec], n = negName(), st = s.staff[0];
+  if (scn==='rec'){
+    const R = s.rec, svc = s.svc[R.s][0], slot = R.slots[R.pick];
+    return [
+      {clock:'23:47', sys:'Hoy · 23:47 · el negocio está cerrado'},
+      {c:R.q},
+      {fx:()=>{bump('conv'); log('💬',`${R.cli} pregunta por ${svc.toLowerCase()} (respondido en 3 s)`,'23:47');}},
+      {a:R.a},
+      {chips:R.slots, pick:R.pick},
+      {c:slot},
+      {a:R.conf},
+      {fx:()=>{addAppt(slot,R.cli,svc); bump('cit'); log('🗓️',`Nueva ${s.cita}: ${R.cli} · ${svc} · sábado ${slot}`,'23:48'); toast(`Nueva ${s.cita} · ${n}`,`${R.cli} · ${svc} · sábado ${slot}`);}},
+      {wait:1400},
+      {fx:()=>log('📲',`Aviso enviado a ${st.replace(/^(la|el) /,'')} por WhatsApp. Recordatorio programado para el viernes`,'23:48')},
+      {sys:'Mientras tanto, tú estabas durmiendo 😴'},
+    ];
+  }
+  if (scn==='ven'){
+    const V = s.ven;
+    return [
+      {clock:'22:10', chan:'INSTAGRAM', sys:'Domingo · 22:10 · mensaje directo de Instagram'},
+      {c:V.q},
+      {fx:()=>{bump('conv'); log('💬',`${V.cli} escribe por Instagram`,'22:10');}},
+      {a:V.a},
+      {c:V.r},
+      {a:`¡Genial! Para que ${st} te prepare la propuesta, ¿me dejas tu nombre completo y un teléfono? Te llamamos mañana sin compromiso 📲`},
+      {c:`${V.cli} ${V.ape}, 6${String(10+sec.length*7).slice(0,2)} 48 21 07`},
+      {a:`¡Apuntado, ${V.cli}! Mañana a las 10:00 te llama ${st} con todo preparado. Que pases buena noche 🌙`},
+      {fx:()=>{bump('lead'); showLead({name:`${V.cli} ${V.ape}`,chan:'Instagram · domingo 22:10',want:V.want,val:V.val,next:`Llamada mañana 10:00 · ${st.replace(/^(la|el) /,'')}`}); log('🔥',`Cliente potencial: ${V.want} (≈ ${eur(V.val)})`,'22:12'); toast('🔥 Cliente interesado',`${V.cli} ${V.ape} · ${V.want}`);}},
+      {sys:'El lunes a las 9:00 tienes el resumen en tu móvil'},
+    ];
+  }
+  // seguimiento
+  const G = s.seg, svc = s.svc[G.s][0], cit = s.cita;
+  return [
+    {clock:'19:00', sys:'Viernes · 19:00 · recordatorio automático'},
+    {a:`Hola ${G.cli} 👋 Te recuerdo tu ${cit} de mañana a las 10:30 (${svc}) en ${n}. ¿Te viene bien?`},
+    {chips:['Sí, allí estaré','Necesito cambiarla'], pick:1},
+    {c:'uff mañana no puedo, se me ha complicado 😩 ¿podría ser la semana que viene?'},
+    {a:'¡Sin problema! Te la cambio. El martes tengo:'},
+    {chips:['17:00','18:30','19:15'], pick:1},
+    {c:'18:30 perfecto'},
+    {a:`Hecho ✅ Movida al martes a las 18:30. ¡Gracias por avisar con tiempo, ${G.cli}!`},
+    {fx:()=>{cancelAppt('10:30'); log('↪️',`${G.cli} cambia su ${cit} al martes 18:30. Hueco del sábado 10:30 libre`,'19:02');}},
+    {wait:1500},
+    {fx:()=>{addAppt('10:30','Pilar (lista de espera)',svc); bump('cit'); log('⚡','Hueco ofrecido a la lista de espera → Pilar lo coge en 6 min','19:08'); toast('Hueco recuperado','Sábado 10:30 · Pilar (lista de espera)');}},
+    {clock:'20:15', sys:'Martes · 20:15 · después de su visita'},
+    {a:`¿Qué tal todo, ${G.cli}? 😊 Si te ha gustado, nos ayudarías muchísimo con una reseña en Google, son 20 segundos ⭐\ng.page/r/${n.toLowerCase().normalize('NFD').replace(/[^a-z]/g,'').slice(0,12)}`},
+    {c:'Encantadaa, ¡ahora mismo la dejo! ⭐⭐⭐⭐⭐'},
+    {fx:()=>{stats.rev++; $('#sRev').textContent='4,9★'; $('#sRevL').textContent='Reseñas · '+stats.rev; setStat('sRev','4,9★'); log('⭐',`Nueva reseña de 5★ en Google de ${G.cli}`,'20:21');}},
+    {wait:900},
+    {fx:()=>log('🔁','34 clientes llevan +60 días sin venir → mensaje de vuelta enviado. 9 ya han reservado','20:30')},
+    {sys:'Menos huecos vacíos, más reseñas y clientes que vuelven'},
+  ];
+}
+
+let runId = 0, curScene = 'rec', started = false;
+async function play(scn){
+  const tok = ++runId;
+  for (const st of steps(scn)){
+    if (tok !== runId) return;
+    if (st.clock) clockBase = st.clock;
+    if (st.chan) $('#phChan').textContent = st.chan;
+    if (st.sys){ await sleep(500); if(tok!==runId) return; sys(st.sys); await sleep(700); }
+    else if (st.c){ await sleep(900 + Math.min(st.c.length*18, 1400)); if(tok!==runId) return; bubble('c', st.c); }
+    else if (st.a){ await sleep(350); if(!await typing(700 + Math.min(st.a.length*9, 1500), tok)) return; bubble('a', st.a); }
+    else if (st.chips){ await sleep(400); if(tok!==runId) return; const row = chipsRow(st.chips); await sleep(1300); if(tok!==runId) return; row.children[st.pick].classList.add('sel'); }
+    else if (st.fx){ await sleep(250); if(tok!==runId) return; st.fx(); }
+    else if (st.wait){ await sleep(st.wait); }
+  }
+  if (tok === runId){ const r = el('button','replay','↻ Repetir conversación'); r.type='button'; r.onclick = () => startScene(curScene, true); chat.append(r); scrollChat(); }
+}
+
+function startScene(scn, force){
+  if (!force && scn === curScene && chat.childElementCount) return;
+  curScene = scn; runId++; started = true;
+  $$('.tab').forEach(t => t.classList.toggle('on', t.dataset.s === scn));
+  chat.innerHTML = ''; clockBase = null; $('#phChan').textContent = 'WHATSAPP';
+  $('#toast').classList.remove('show');
+  resetPanel(scn);
+  const tryMode = scn === 'try';
+  $('#inp').disabled = $('#send').disabled = !tryMode;
+  $('#sceneNote').textContent = tryMode
+    ? 'Modo prueba: respuestas simuladas con datos de ejemplo. El agente real entiende cualquier mensaje con IA y responde con la información de tu negocio.'
+    : 'Conversación de ejemplo con datos ficticios. El agente real se entrena con tus servicios, precios, horarios y forma de hablar.';
+  if (tryMode) startTry(); else play(scn);
+}
+
+/* ---------- Pruébalo tú ---------- */
+let T = {};
+function agentSay(text, chips, onPick){
+  const tok = runId;
+  return (async()=>{
+    if(!await typing(600 + Math.min(text.length*7, 1200), tok)) return;
+    bubble('a', text);
+    if (chips) chipsRow(chips, onPick || (o => userSay(o)));
+  })();
+}
+function menu(){ return ['💰 Precios', '🗓️ Pedir ' + S[sec].cita, '🕒 Horario', '🙋 Hablar con una persona']; }
+function startTry(){
+  T = {step:null};
+  const s = S[sec];
+  sys('Escríbele como si fueras un cliente ✍️');
+  agentSay(`¡Hola! 👋 Soy el asistente de ${negName()}. Puedo darte precios, buscarte ${s.cita==='visita'?'una visita':'hueco'} o resolver tus dudas. ¿En qué te ayudo?`, menu());
+  setTimeout(()=>$('#inp').focus({preventScroll:true}), 50);
+}
+function userSay(text){
+  text = text.trim(); if (!text) return;
+  bubble('c', text); bump('conv');
+  if (stats.conv === 15) log('💬','Nueva conversación en modo prueba');
+  setTimeout(()=>reply(text), 350);
+}
+function freeSlots(){ const taken = new Set(agenda.filter(a=>!a.gone).map(a=>a.t)); return S[sec].rec.slots.concat(['18:30','19:00']).filter(t=>!taken.has(t)).slice(0,3); }
+function reply(raw){
+  const s = S[sec];
+  const t = raw.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  const svcNames = s.svc.map(x=>x[0]);
+  // flujo de reserva
+  if (T.step === 'svc'){
+    const norm = n => n.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    const full = svcNames.filter(n => t.includes(norm(n))).sort((a,b) => b.length - a.length)[0];
+    T.svc = full || svcNames.find(n => t.includes(norm(n).split(/[ /+]/)[0])) || svcNames[0]; T.step = 'slot';
+    const fs = freeSlots();
+    if (!fs.length){ T.step=null; return agentSay('Vaya, el sábado ya está completo 😅 ¿Te apunto en la lista de espera y te aviso si se libera algo?', ['Sí, apúntame','No, gracias']); }
+    return agentSay(`Perfecto, ${T.svc.toLowerCase()}. Para el ${SAT} me quedan estos huecos:`, fs);
+  }
+  if (T.step === 'slot'){
+    const m = raw.match(/\d{1,2}[:.h]?\d{0,2}/);
+    const fs = freeSlots();
+    let slot = fs.find(x => m && x.replace(':','').startsWith(m[0].replace(/[:.h]/,'').padStart(m[0].length>2?4:2,'0').slice(0,2)));
+    if (!slot) slot = fs[0];
+    T.slot = slot; T.step = 'name';
+    return agentSay(`¡Genial, el sábado a las ${slot}! ¿A nombre de quién lo pongo?`);
+  }
+  if (T.step === 'name'){
+    const name = raw.replace(/^(soy|me llamo|a nombre de)\s+/i,'').split(/[,.\n]/)[0].trim().slice(0,24) || 'Cliente';
+    const nm = name.charAt(0).toUpperCase() + name.slice(1);
+    T.step = null;
+    addAppt(T.slot, nm, T.svc); bump('cit');
+    log('🗓️',`Nueva ${s.cita}: ${nm} · ${T.svc} · sábado ${T.slot}`);
+    toast(`Nueva ${s.cita} · ${negName()}`, `${nm} · ${T.svc} · sábado ${T.slot}`);
+    return agentSay(`¡Hecho, ${nm}! ✅ ${T.svc} el sábado a las ${T.slot}. Te mando un recordatorio el día antes. ¿Necesitas algo más?\n\n(Mira el panel 👉 ya aparece en la agenda)`, ['💰 Precios','🕒 Horario','No, gracias']);
+  }
+  // intenciones
+  if (/precio|cuanto|cuesta|tarifa|vale|cobr|presupuest|€|euro/.test(t)){
+    const lines = s.svc.map(([n,d,p]) => `• ${n}: ${priceTxt(p, s.per)}${d?` (${d>=60?Math.floor(d/60)+' h'+(d%60?' '+d%60+' min':''):d+' min'})`:''}`).join('\n');
+    return agentSay(`Estos son nuestros precios:\n${lines}\n\n¿Te busco ${s.cita==='visita'?'una visita':'hueco'}?`, ['🗓️ Sí, pedir '+s.cita,'🕒 Horario']);
+  }
+  if (/cita|reserv|hueco|mesa|visita|turno|disponib|pedir|apart|recog|quiero|libre|sabado|manana|hoy/.test(t)){
+    T.step = 'svc';
+    return agentSay(s.cita==='reserva' ? '¡Claro! ¿Qué te apetece?' : s.cita==='visita' ? '¡Claro! ¿Qué te interesa?' : '¡Claro! ¿Qué servicio quieres?', svcNames);
+  }
+  if (/horario|abr|cierr|hora|cuando/.test(t)){
+    return agentSay(`Abrimos de lunes a viernes de 9:30 a 20:00 y los sábados de 9:00 a 14:00${s.cita==='reserva'?' (cocina hasta las 23:30)':''}. Y yo contesto 24 h 😉`, ['🗓️ Pedir '+s.cita,'💰 Precios']);
+  }
+  if (/donde|direcc|ubica|llegar|aparc|calle/.test(t)){
+    return agentSay(`Estamos en el centro${P.get('ciudad')?' de '+P.get('ciudad').slice(0,30):''}, a 2 minutos del parking público 📍 Te mando la ubicación en Google Maps si quieres.`, ['🗓️ Pedir '+s.cita]);
+  }
+  if (/persona|humano|dueno|duena|encargad|llam|hablar|telefono/.test(t)){
+    log('🙋','Un cliente pide hablar con una persona → aviso enviado');
+    toast('🙋 Te necesitan', 'Un cliente quiere hablar contigo');
+    return agentSay(`¡Claro! Le paso tu mensaje a ${s.staff[0]} y te escribe en cuanto pueda (normalmente en menos de 1 hora) 🙂`);
+  }
+  if (/lista de espera|apuntame/.test(t)){ log('📝','Cliente añadido a la lista de espera'); return agentSay('¡Apuntado! Si se libera un hueco, te escribo el primero ⚡'); }
+  if (/gracias|perfecto|genial|vale|ok|no,? gracias/.test(t)) return agentSay('¡A ti! Aquí estoy para lo que necesites, a cualquier hora 💙');
+  if (/hola|buenas|hey|ey|saludos/.test(t)) return agentSay('¡Hola! 😊 ¿Quieres precios, pedir '+s.cita+' o tienes alguna duda?', menu());
+  if (/robot|ia|inteligencia|eres real|maquina/.test(t)) return agentSay(`Soy el asistente virtual de ${negName()} ✦ Atiendo al momento a cualquier hora y, si hace falta, te paso con el equipo.`);
+  log('📝',`Pregunta sin respuesta guardada para el negocio: "${raw.slice(0,50)}"`);
+  return agentSay('Buena pregunta 🤔 En esta demo no tengo esa información, pero el agente real la tendría porque se entrena con los datos de tu negocio. Y si no la sabe, no se la inventa: te pasa la conversación.', menu());
+}
+$('#form').addEventListener('submit', e => { e.preventDefault(); const v = $('#inp').value; $('#inp').value=''; if (curScene==='try') { chat.querySelectorAll('.chips button').forEach(b=>b.disabled=true); userSay(v); } });
+
+/* ---------- Tabs ---------- */
+$$('.tab').forEach(t => t.onclick = () => startScene(t.dataset.s, true));
+$$('[data-go]').forEach(b => b.onclick = () => { $('#demo').scrollIntoView({behavior:'smooth'}); setTimeout(()=>startScene(b.dataset.go, true), 450); });
+$('#restart').onclick = () => startScene(curScene, true);
+
+/* ---------- Calculadora ---------- */
+function calc(){
+  const m=+$('#rMsg').value, p=+$('#rPct').value, tk=+$('#rTk').value, cv=+$('#rCv').value;
+  [['rMsg'],['rPct'],['rTk'],['rCv']].forEach(([id])=>{const r=$('#'+id); r.style.setProperty('--p', ((r.value-r.min)/(r.max-r.min)*100)+'%');});
+  $('#vMsg').textContent=m; $('#vPct').textContent=p+' %'; $('#vTk').textContent=eur(tk); $('#vCv').textContent=cv+' %';
+  const cli = Math.round(m*30*p/100*cv/100), money = cli*tk, hrs = Math.round(m*30*3/60);
+  $('#oEur').textContent = eur(money); $('#oCli').textContent = cli; $('#oHrs').textContent = hrs+' h';
+  $('#oRoi').textContent = (money/300).toLocaleString('es-ES',{maximumFractionDigits:1})+'×';
+}
+['rMsg','rPct','rTk','rCv'].forEach(id => $('#'+id).addEventListener('input', calc));
+
+/* ---------- Orbe 3D (canvas, sin librerías) ---------- */
+function orb(){
+  const cv = $('#orb'), ctx = cv.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const N = innerWidth < 700 ? 420 : 760, pts = [];
+  const ga = Math.PI*(3-Math.sqrt(5));
+  for (let i=0;i<N;i++){ const y = 1 - (i/(N-1))*2, r = Math.sqrt(1-y*y), th = ga*i; pts.push([Math.cos(th)*r, y, Math.sin(th)*r]); }
+  const pairs = [];
+  for (let i=0;i<N;i++) for (let j=i+1;j<N;j++){ const dx=pts[i][0]-pts[j][0],dy=pts[i][1]-pts[j][1],dz=pts[i][2]-pts[j][2]; if (dx*dx+dy*dy+dz*dz < (N>500?0.012:0.02)) pairs.push([i,j]); }
+  const pulses = [];
+  let W,H,dpr,cx,cy,R, rx=0.35, ry=0, mx=0, my=0, vis=true;
+  function size(){ dpr=Math.min(devicePixelRatio||1,2); W=cv.clientWidth; H=cv.clientHeight; cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    const wide = W>1000; cx = wide ? W*0.72 : W*0.5; cy = wide ? H*0.5 : H*0.3; R = Math.min(wide? H*0.36 : W*0.52, 380); }
+  size(); addEventListener('resize', size);
+  addEventListener('pointermove', e => { mx = (e.clientX/innerWidth-.5); my = (e.clientY/innerHeight-.5); });
+  new IntersectionObserver(([e]) => vis = e.isIntersecting).observe(cv);
+  const proj = new Array(N);
+  function frame(t){
+    requestAnimationFrame(frame); if (!vis) return;
+    ry += reduce ? 0.0006 : 0.0022; const ax = rx + my*0.4, ay = ry + mx*0.6;
+    const ca=Math.cos(ay), sa=Math.sin(ay), cb=Math.cos(ax), sb=Math.sin(ax);
+    const breathe = 1 + Math.sin(t/1600)*0.015;
+    for (let i=0;i<N;i++){ let [x,y,z]=pts[i]; let x1=x*ca+z*sa, z1=-x*sa+z*ca; let y1=y*cb-z1*sb, z2=y*sb+z1*cb; const s = 2.4/(2.4+z2); proj[i]=[cx+x1*R*s*breathe, cy+y1*R*s*breathe, z2, s]; }
+    ctx.clearRect(0,0,W,H);
+    const g = ctx.createRadialGradient(cx,cy,R*0.1,cx,cy,R*1.5); g.addColorStop(0,'rgba(25,240,224,.10)'); g.addColorStop(.5,'rgba(124,108,255,.05)'); g.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    ctx.lineWidth = 0.6;
+    for (const [i,j] of pairs){ const a=proj[i], b=proj[j]; const d=(a[2]+b[2])/2; const al = (0.5-d*0.45)*0.32; if (al<=0.01) continue;
+      ctx.strokeStyle = `rgba(${d<0?'25,240,224':'124,108,255'},${al})`; ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke(); }
+    for (let i=0;i<N;i++){ const p=proj[i]; const f=(1-p[2])/2; const r = 0.6+f*1.9;
+      ctx.fillStyle = `rgba(${Math.round(25+(124-25)*(1-f))},${Math.round(240-(240-108)*(1-f))},${Math.round(224+(255-224)*(1-f))},${0.25+f*0.75})`;
+      ctx.beginPath(); ctx.arc(p[0],p[1],r,0,6.283); ctx.fill(); }
+    if (!reduce && Math.random()<0.18 && pulses.length<26) pulses.push({k:pairs[(Math.random()*pairs.length)|0], t:0, n:6+(Math.random()*8|0)});
+    for (let k=pulses.length-1;k>=0;k--){ const pu=pulses[k]; pu.t += 0.06; if (pu.t>=1){ // saltar a un vecino
+        const end = pu.k[1]; const nx = pairs.filter(q=>q[0]===end||q[1]===end); pu.n--; if (!nx.length||pu.n<=0){pulses.splice(k,1);continue;}
+        const q = nx[(Math.random()*nx.length)|0]; pu.k = q[0]===end?q:[q[1],q[0]]; pu.t=0; }
+      const a=proj[pu.k[0]], b=proj[pu.k[1]]; if (a[2]>0.2) continue;
+      const x=a[0]+(b[0]-a[0])*pu.t, y=a[1]+(b[1]-a[1])*pu.t;
+      ctx.fillStyle='rgba(220,255,252,.95)'; ctx.shadowColor='#19f0e0'; ctx.shadowBlur=10; ctx.beginPath(); ctx.arc(x,y,1.8,0,6.283); ctx.fill(); ctx.shadowBlur=0; }
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ---------- Reveal, nav, tilt ---------- */
+function ui(){
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }), {threshold:.12});
+  $$('.rv').forEach((n,i) => { n.style.transitionDelay = (i%4)*70+'ms'; io.observe(n); });
+  addEventListener('scroll', () => $('#nav').classList.toggle('solid', scrollY>30), {passive:true});
+  $$('.tilt').forEach(c => {
+    c.addEventListener('pointermove', e => { const r=c.getBoundingClientRect(); const x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5; c.style.transform=`perspective(900px) rotateY(${x*8}deg) rotateX(${-y*8}deg) translateY(-4px)`; });
+    c.addEventListener('pointerleave', () => c.style.transform='');
+  });
+  // arranca la demo cuando se ve
+  new IntersectionObserver(([e]) => { if (e.isIntersecting && !started){ started=true; startScene('rec', true); } }, {threshold:.35}).observe($('.phone'));
+}
+
+/* ---------- Generador de enlaces (?crear=1) ---------- */
+function builder(){
+  if (!P.has('crear')) return;
+  const b = $('#builder'); b.classList.add('show');
+  SECTOR_KEYS.forEach(k => { const o = el('option',null,S[k].label); o.value=k; $('#bSec').append(o); });
+  $('#bSec').value = sec;
+  const base = /^https?:/.test(location.protocol) ? location.origin + location.pathname : 'https://TU-WEB/demo-agentes-ia.html';
+  $('#bNote').textContent = /^https?:/.test(location.protocol) ? '' : 'Ojo: abre esta página desde tu web publicada para que el enlace funcione fuera de tu ordenador.';
+  const upd = () => {
+    const n = $('#bNeg').value.trim();
+    const url = base + '?' + new URLSearchParams(Object.assign({}, n?{negocio:n}:{}, {sector:$('#bSec').value})).toString();
+    $('#bOut').value = `¡Hola${n?', '+n:''}! 👋 Soy de Nexenia. Os he preparado una demo de 2 minutos de cómo un asistente de IA atendería a vuestros clientes por WhatsApp e Instagram, incluso de madrugada:\n${url}\n¿Le echáis un vistazo y me decís qué os parece? 🙂`;
+  };
+  $('#bNeg').oninput = upd; $('#bSec').onchange = upd; upd();
+  $('#bCopy').onclick = async () => { try { await navigator.clipboard.writeText($('#bOut').value); $('#bCopy').textContent='¡Copiado! ✅'; } catch { $('#bOut').select(); document.execCommand('copy'); $('#bCopy').textContent='¡Copiado! ✅'; } setTimeout(()=>$('#bCopy').textContent='Copiar mensaje con enlace',1600); };
+}
+
+initHero(); applySector(); resetPanel('rec'); orb(); ui(); builder(); calc();
+})();
+</script>
+</body>
+</html>
