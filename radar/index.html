@@ -511,7 +511,8 @@ function errCopy(e){
   if (c==="no_mcp"||c==="server_not_connected"||c==="not_granted"||c==="capability_disabled") return "<b>No se ha podido escanear desde aquí.</b> Lo que ves abajo sigue siendo el ejemplo. El escaneo real funciona en la <b>app Claude de escritorio</b> o en la versión de Radar Nexenia subida a tu web (esa funciona también en el móvil).";
   if (c==="not_in_manifest"||c==="approval_required") return "No has permitido el navegador para esta página. Vuelve a pulsar y acepta el permiso.";
   if (c==="cancelled") return "Cancelaste el permiso del navegador.";
-  if (c==="tool_error") return "El navegador no pudo abrir la página: "+esc(e.message||"");
+  if (c==="scan_failed") return "<b>No se pudo escanear.</b> "+esc(e.message)+"<br><small>Detalle: "+esc((e.detail||[]).join(" | "))+"</small>";
+  if (c==="tool_error") return "No se pudo completar: "+esc(e.message||"");
   return "No se pudo completar ("+esc(c||"error")+"). Prueba de nuevo en unos segundos.";
 }
 
@@ -530,6 +531,41 @@ async function fetchText(url){
     }catch(e){ if (e && e.code) throw e; if (directOK===true) throw {code:"tool_error",message:"Sin respuesta de OpenStreetMap"}; directOK = false; }
   }
   return browse(url);
+}
+/* Varios servidores de OpenStreetMap: si uno está saturado se prueba el siguiente */
+const OVERPASS = [
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.private.coffee/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
+  "https://maps.mail.ru/osm/tools/overpass/api/interpreter"
+];
+let opStart = 0;
+async function overpass(q, log){
+  for (let n=0; n<OVERPASS.length; n++){
+    const base = OVERPASS[(opStart+n) % OVERPASS.length], host = new URL(base).host;
+    try{
+      let t;
+      if (directOK !== false){
+        try{
+          const ctl = new AbortController(), to = setTimeout(()=>ctl.abort(), 90000);
+          const r = await fetch(base, {method:"POST", body:new URLSearchParams({data:q}), signal:ctl.signal});
+          clearTimeout(to); directOK = true;
+          if (!r.ok){ log.push(`${host}: ${r.status}${r.status===429?" (saturado)":r.status===504?" (tiempo agotado)":""}`); continue; }
+          t = await r.text();
+        }catch(e){
+          if (directOK === null){ directOK = false; }
+          else { log.push(`${host}: ${e && e.name==="AbortError" ? "no respondió en 90 s" : "conexión rechazada"}`); continue; }
+        }
+      }
+      if (t == null) t = await browse(base+"?data="+encodeURIComponent(q));
+      if (/"elements"/.test(t)){ opStart = (opStart+n) % OVERPASS.length; return t; }
+      log.push(`${host}: ${/rate_limited|Too Many/i.test(t)?"saturado":/timeout|timed out/i.test(t)?"tiempo agotado":"respuesta no válida"}`);
+    }catch(e){
+      if (e && e.code && e.code!=="tool_error") throw e;
+      log.push(`${host}: ${e && e.message ? e.message : "error"}`);
+    }
+  }
+  return null;
 }
 async function geocode(q){
   const url = "https://nominatim.openstreetmap.org/search?format=json&countrycodes=es&addressdetails=0&limit=5&accept-language=es&q="+encodeURIComponent(q);
@@ -579,14 +615,13 @@ async function runScan(place){
   const city = place.name.split(",")[0];
   try{
     // Un sector por petición: respuestas más pequeñas, sin recortes y con un máximo por sector
-    const seen = new Set(), items = [], cut = [], full = [], failed = [];
+    const seen = new Set(), items = [], cut = [], full = [], failed = [], errLog = [];
     for (let i=0; i<selSects.length; i++){
       const s = selSects[i];
       busy(`Escaneando ${SECT[s].l} (${i+1}/${selSects.length}) en ${km} km alrededor de ${city}…`);
-      let t;
-      try { t = await fetchText("https://overpass-api.de/api/interpreter?data="+encodeURIComponent(buildQuery(place.lat, place.lon, km, [s], limit))); }
-      catch(e){ if (e.code==="tool_error"){ failed.push(SECT[s].l); continue; } throw e; }
-      if (!/"elements"/.test(t)){ failed.push(SECT[s].l); continue; }
+      const log = [];
+      const t = await overpass(buildQuery(place.lat, place.lon, km, [s], limit), log);
+      if (!t){ failed.push(SECT[s].l); errLog.push(SECT[s].l+" → "+log.join(" · ")); continue; }
       const els = extractElements(t) || [];
       let whole = false; try { JSON.parse(t.slice(t.indexOf("{"), t.lastIndexOf("}")+1)); whole = true; } catch(e){}
       if (!whole) cut.push(SECT[s].l);
@@ -594,14 +629,14 @@ async function runScan(place){
       for (const el of els){ const it = toItem(el, place); if (it && !seen.has(it.id)){ seen.add(it.id); items.push(it); } }
       lastRaw = {sector:SECT[s].l, chars:t.length, els:els.length};
     }
-    if (!items.length && failed.length===selSects.length) throw {code:"tool_error",message:"OpenStreetMap no respondió (puede estar saturado). Espera un minuto y vuelve a intentarlo."};
+    if (!items.length && failed.length===selSects.length) throw {code:"scan_failed",message:"Ningún servidor de OpenStreetMap devolvió datos. Espera un par de minutos y vuelve a intentarlo, o baja el radio y el máximo.",detail:errLog};
     scan = {id:"s"+Date.now(), city, lat:place.lat, lon:place.lon, radius:km, items, sects:selSects.slice(), createdAt:Date.now()};
     view = {z:1,x:0,y:0}; filt.sect="all"; filt.shown=40;
     renderAll();
     let warn = "";
     if (full.length) warn += ` En ${full.join(", ")} has llegado al máximo de ${limit} por sector: OSM devuelve los primeros que encuentra, no los más cercanos. Sube el máximo o baja el radio.`;
     if (cut.length) warn += ` La respuesta de ${cut.join(", ")} llegó recortada por el navegador; baja el máximo a 150 o reduce el radio.`;
-    if (failed.length) warn += ` No respondió: ${failed.join(", ")}. Vuelve a escanear esos sectores en un minuto.`;
+    if (failed.length) warn += ` No respondió: ${failed.join(", ")}. Vuelve a escanear esos sectores en un minuto.<br><small>${esc(errLog.join(" | "))}</small>`;
     say(`<b>${fmt(items.length)} negocios</b> en ${esc(city)} (${km} km).${warn} Recuerda: “sin web” es según OpenStreetMap; verifica antes de llamar.`, warn?"warn":"");
     saveScan();
   } catch(e){ say(errCopy(e),"err"); }
