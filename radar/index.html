@@ -21,6 +21,8 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0}
 html,body{background:var(--bg);color:var(--fg)}
 body{font-family:var(--body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
@@ -928,7 +930,7 @@ $("#prices").addEventListener("change", e => { const i=e.target; if(!i.dataset.k
 
 /* ---------- Arranque ---------- */
 function setStatus(){
-  $("#status").innerHTML = hasBrowser ? "<b>Escaneo en vivo listo</b><br>navegador de la app" : "Modo consulta<br><span>escanea desde la app de escritorio</span>";
+  $("#status").innerHTML = !window.claude ? "<b>Escaneo en vivo listo</b><br>datos de OpenStreetMap" : hasBrowser ?"<b>Escaneo en vivo listo</b><br>navegador de la app" : "Modo consulta<br><span>escanea desde la app de escritorio</span>";
 }
 leads = store.get("rn_leads", {});
 renderSectPick(); renderPrices();
