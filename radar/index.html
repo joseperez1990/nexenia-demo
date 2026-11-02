@@ -511,6 +511,7 @@ function errCopy(e){
   if (c==="no_mcp"||c==="server_not_connected"||c==="not_granted"||c==="capability_disabled") return "<b>No se ha podido escanear desde aquí.</b> Lo que ves abajo sigue siendo el ejemplo. El escaneo real funciona en la <b>app Claude de escritorio</b> o en la versión de Radar Nexenia subida a tu web (esa funciona también en el móvil).";
   if (c==="not_in_manifest"||c==="approval_required") return "No has permitido el navegador para esta página. Vuelve a pulsar y acepta el permiso.";
   if (c==="cancelled") return "Cancelaste el permiso del navegador.";
+  if (c==="geo_failed") return "<b>No se pudo localizar la ciudad.</b> Los servidores de mapas no respondieron. Espera un minuto y vuelve a intentarlo.<br><small>Detalle: "+esc((e.detail||[]).join(" | "))+"</small>";
   if (c==="scan_failed") return "<b>No se pudo escanear.</b> "+esc(e.message)+"<br><small>Detalle: "+esc((e.detail||[]).join(" | "))+"</small>";
   if (c==="tool_error") return "No se pudo completar: "+esc(e.message||"");
   return "No se pudo completar ("+esc(c||"error")+"). Prueba de nuevo en unos segundos.";
@@ -519,19 +520,25 @@ function errCopy(e){
 /* ---------- Geocodificar ---------- */
 /* Primero intenta pedir los datos directamente (funciona si la página está en tu propia web);
    si el entorno lo bloquea, usa el navegador de la app de escritorio. */
-let lastRaw = null, directOK = null;
-async function fetchText(url){
-  if (directOK !== false){
+let lastRaw = null;
+/* Fuera de Claude (tu web) se pide todo directamente; dentro de Claude, por el navegador de la app */
+const IN_CLAUDE = !!(window.claude && window.claude.use);
+async function get(url, opts, ms){
+  if (!IN_CLAUDE){
+    const ctl = new AbortController(), to = setTimeout(()=>ctl.abort(), ms||60000);
     try{
-      const ctl = new AbortController(), to = setTimeout(()=>ctl.abort(), 120000);
-      const r = await fetch(url, {signal:ctl.signal}); clearTimeout(to);
-      directOK = true;
-      if (r.status===429 || r.status===504) throw {code:"tool_error",message:"OpenStreetMap saturado ("+r.status+")"};
+      const r = await fetch(url, Object.assign({signal:ctl.signal}, opts||{}));
+      if (!r.ok) throw {code:"http", message:"HTTP "+r.status+(r.status===429?" (saturado)":r.status===504?" (tiempo agotado)":r.status===403?" (bloqueado)":"")};
       return await r.text();
-    }catch(e){ if (e && e.code) throw e; if (directOK===true) throw {code:"tool_error",message:"Sin respuesta de OpenStreetMap"}; directOK = false; }
+    }catch(e){
+      if (e && e.code) throw e;
+      throw {code:"http", message: e && e.name==="AbortError" ? "no respondió a tiempo" : "sin conexión o bloqueado por el navegador"};
+    } finally { clearTimeout(to); }
   }
+  if (opts && opts.body) url += (url.includes("?")?"&":"?") + opts.body.toString();
   return browse(url);
 }
+async function fetchText(url){ return get(url); }
 /* Varios servidores de OpenStreetMap: si uno está saturado se prueba el siguiente */
 const OVERPASS = [
   "https://overpass-api.de/api/interpreter",
@@ -544,35 +551,44 @@ async function overpass(q, log){
   for (let n=0; n<OVERPASS.length; n++){
     const base = OVERPASS[(opStart+n) % OVERPASS.length], host = new URL(base).host;
     try{
-      let t;
-      if (directOK !== false){
-        try{
-          const ctl = new AbortController(), to = setTimeout(()=>ctl.abort(), 90000);
-          const r = await fetch(base, {method:"POST", body:new URLSearchParams({data:q}), signal:ctl.signal});
-          clearTimeout(to); directOK = true;
-          if (!r.ok){ log.push(`${host}: ${r.status}${r.status===429?" (saturado)":r.status===504?" (tiempo agotado)":""}`); continue; }
-          t = await r.text();
-        }catch(e){
-          if (directOK === null){ directOK = false; }
-          else { log.push(`${host}: ${e && e.name==="AbortError" ? "no respondió en 90 s" : "conexión rechazada"}`); continue; }
-        }
-      }
-      if (t == null) t = await browse(base+"?data="+encodeURIComponent(q));
+      const t = await get(base, {method:"POST", body:new URLSearchParams({data:q})}, 90000);
       if (/"elements"/.test(t)){ opStart = (opStart+n) % OVERPASS.length; return t; }
       log.push(`${host}: ${/rate_limited|Too Many/i.test(t)?"saturado":/timeout|timed out/i.test(t)?"tiempo agotado":"respuesta no válida"}`);
     }catch(e){
-      if (e && e.code && e.code!=="tool_error") throw e;
+      if (e && e.code && !["http","tool_error"].includes(e.code)) throw e;
       log.push(`${host}: ${e && e.message ? e.message : "error"}`);
     }
   }
   return null;
 }
+/* Buscar la ciudad: Nominatim → Photon → OpenStreetMap directo */
 async function geocode(q){
-  const url = "https://nominatim.openstreetmap.org/search?format=json&countrycodes=es&addressdetails=0&limit=5&accept-language=es&q="+encodeURIComponent(q);
-  const t = await fetchText(url);
-  const a = t.indexOf("["), b = t.lastIndexOf("]");
-  if (a<0||b<a) throw {code:"tool_error",message:"Respuesta de geocodificación ilegible"};
-  return JSON.parse(t.slice(a,b+1)).map(r=>({name:r.display_name, lat:+r.lat, lon:+r.lon}));
+  const log = [];
+  try{
+    const t = await get("https://nominatim.openstreetmap.org/search?format=json&countrycodes=es&addressdetails=0&limit=5&accept-language=es&q="+encodeURIComponent(q), null, 20000);
+    const a = t.indexOf("["), b = t.lastIndexOf("]");
+    const r = JSON.parse(t.slice(a,b+1)).map(r=>({name:r.display_name, lat:+r.lat, lon:+r.lon}));
+    if (r.length) return r;
+    log.push("nominatim: sin resultados");
+  }catch(e){ if (e && e.code==="no_mcp") throw e; log.push("nominatim: "+(e && e.message || "error")); }
+  try{
+    const t = await get("https://photon.komoot.io/api/?limit=6&lang=es&bbox=-18.5,27.4,4.6,44.0&q="+encodeURIComponent(q), null, 20000);
+    const j = JSON.parse(t.slice(t.indexOf("{"), t.lastIndexOf("}")+1));
+    const r = (j.features||[]).filter(f=>(f.properties.countrycode||"").toUpperCase()==="ES").map(f=>({
+      name:[f.properties.name, f.properties.county||f.properties.state, "España"].filter(Boolean).join(", "),
+      lat:f.geometry.coordinates[1], lon:f.geometry.coordinates[0]}));
+    if (r.length) return r;
+    log.push("photon: sin resultados");
+  }catch(e){ if (e && e.code==="no_mcp") throw e; log.push("photon: "+(e && e.message || "error")); }
+  const name = q.split(",")[0].trim().replace(/"/g,"");
+  const t = await overpass(`[out:json][timeout:40];area["ISO3166-1"="ES"][admin_level=2]->.es;(node["place"~"^(city|town|village|suburb)$"]["name"="${name}"](area.es););out 5;`, log);
+  if (t){
+    const els = extractElements(t) || [];
+    const r = els.filter(e=>e.lat).map(e=>({name:e.tags.name+", España", lat:e.lat, lon:e.lon}));
+    if (r.length) return r;
+    log.push("openstreetmap: no encuentra esa localidad");
+  }
+  throw {code:"geo_failed", message:"No he podido localizar la ciudad.", detail:log};
 }
 
 /* ---------- Overpass ---------- */
