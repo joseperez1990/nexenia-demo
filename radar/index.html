@@ -78,13 +78,18 @@ button{cursor:pointer}
 
 .mapcard{position:relative;border-radius:24px;overflow:hidden;border:1px solid var(--line);background:#0f1411}
 #map{display:block;width:100%;height:440px;touch-action:none;cursor:grab}
+#lmap{width:100%;height:440px;background:#0f1411}
+#lmap .leaflet-control-attribution{background:#0b0e0ccc;color:var(--muted);font-size:10px}
+#lmap .leaflet-control-attribution a{color:var(--muted)}
+#lmap .leaflet-control-zoom a{background:var(--panel);color:var(--fg);border-color:var(--line)}
+.leaflet-tooltip.rn-tip{background:#0b0e0cf2;color:var(--fg);border:1px solid var(--line);border-radius:10px;font:12px var(--body)}
 .mapctl{position:absolute;top:12px;left:12px;display:flex;flex-direction:column;background:#141915e6;border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .mapctl button{width:40px;height:40px;border:0;background:transparent;font-size:20px}
 .mapctl button+button{border-top:1px solid var(--line)}
-.legend{position:absolute;left:12px;right:12px;bottom:12px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;background:#0b0e0ce6;border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:13px;width:max-content;max-width:calc(100% - 24px)}
+.legend{z-index:500;position:absolute;left:12px;right:12px;bottom:12px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;background:#0b0e0ce6;border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:13px;width:max-content;max-width:calc(100% - 24px)}
 .legend span{display:flex;align-items:center;gap:6px}
 .legend i{width:11px;height:11px;border-radius:50%;display:block}
-.maptag{position:absolute;top:12px;right:12px;font-size:11px;color:var(--muted);background:#0b0e0ccc;border-radius:8px;padding:4px 8px;font-family:var(--mono)}
+.maptag{z-index:500;position:absolute;top:12px;right:12px;font-size:11px;color:var(--muted);background:#0b0e0ccc;border-radius:8px;padding:4px 8px;font-family:var(--mono)}
 .tip{position:absolute;pointer-events:none;background:#0b0e0cf2;border:1px solid var(--line);border-radius:10px;padding:6px 9px;font-size:12px;max-width:220px}
 
 h2{font-family:var(--display);font-weight:800;font-size:clamp(24px,6vw,34px);line-height:1.05;letter-spacing:-.03em;margin:6px 0 0;text-wrap:balance}
@@ -167,7 +172,7 @@ a{color:var(--blue)}
 .saved button{text-align:left;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:13px;display:flex;justify-content:space-between;gap:10px}
 .saved button span{color:var(--muted)}
 @media (max-width:480px){
-  #map{height:360px}
+  #map,#lmap{height:380px}
   .card{grid-template-columns:minmax(0,1fr)}
   .card .side{flex-direction:row;align-items:center;justify-content:space-between;text-align:left;flex-wrap:wrap}
   .kv{grid-template-columns:90px minmax(0,1fr)}
@@ -205,6 +210,7 @@ a{color:var(--blue)}
 
   <div class="mapcard">
     <canvas id="map" aria-label="Mapa de negocios por oportunidad"></canvas>
+    <div id="lmap" hidden aria-label="Mapa de negocios"></div>
     <div class="mapctl"><button id="zin" aria-label="Acercar">+</button><button id="zout" aria-label="Alejar">−</button></div>
     <div class="maptag" id="mapTag">Ejemplo</div>
     <div class="legend" id="legend"></div>
@@ -369,7 +375,54 @@ const cv = $("#map"), ctx = cv.getContext("2d");
 let view = {z:1, x:0, y:0};
 let dots = [];
 function colorFor(t){ return t==="alta" ? "#b6f23a" : t==="media" ? "#f5a524" : "#5b665e"; }
+/* ---------- Mapa real con calles (solo en tu web; dentro de Claude se usa el radar) ---------- */
+let LMAP = null, LLAYER = null, LKEY = "";
+function loadLeaflet(){
+  return new Promise((res, rej) => {
+    const css = document.createElement("link"); css.rel = "stylesheet";
+    css.href = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"; document.head.appendChild(css);
+    const js = document.createElement("script");
+    js.src = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";
+    js.onload = () => window.L ? res() : rej(); js.onerror = rej; document.head.appendChild(js);
+  });
+}
+async function initRealMap(){
+  try{
+    await loadLeaflet();
+    const el = $("#lmap"); el.hidden = false; cv.hidden = true;
+    document.querySelector(".mapctl").hidden = true;
+    LMAP = L.map(el, {zoomControl:true, attributionControl:true, preferCanvas:true}).setView([36.764,-2.615], 12);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      maxZoom: 19, subdomains:"abcd",
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    }).addTo(LMAP);
+    LLAYER = L.layerGroup().addTo(LMAP);
+    drawMap();
+  }catch(e){ $("#lmap").hidden = true; cv.hidden = false; document.querySelector(".mapctl").hidden = false; drawMap(); }
+}
+function drawRealMap(){
+  if (!scan) return;
+  LLAYER.clearLayers();
+  const key = scan.id+"|"+scan.radius;
+  const ring = L.circle([scan.lat, scan.lon], {radius:scan.radius*1000, color:"#3d5a1e", weight:1.5, fill:false, interactive:false}).addTo(LLAYER);
+  L.circleMarker([scan.lat, scan.lon], {radius:4, color:"#eef3ee", fillColor:"#eef3ee", fillOpacity:1, weight:1, interactive:false}).addTo(LLAYER);
+  const vis = [...visible()].sort((a,b)=>a._a.prob-b._a.prob);
+  for (const it of vis){
+    const st = (leads[it.id]||{}).estado;
+    const m = L.circleMarker([it.lat, it.lon], {
+      radius: 7, weight: st && st!=="nuevo" ? 3 : 1.5,
+      color: st && st!=="nuevo" ? "#7cc4ff" : "#0b0e0c",
+      fillColor: colorFor(it._a.ptier), fillOpacity: .95
+    });
+    m.bindTooltip(`${esc(it.n)} · ${it._a.prob}% · hasta ${fmt(it._a.setup)} €`, {className:"rn-tip", direction:"top", offset:[0,-6]});
+    m.on("click", () => openSheet(it.id));
+    m.addTo(LLAYER);
+  }
+  if (key !== LKEY){ LKEY = key; LMAP.fitBounds(ring.getBounds(), {padding:[10,10]}); }
+  setTimeout(()=>LMAP.invalidateSize(), 50);
+}
 function drawMap(){
+  if (LMAP){ drawRealMap(); $("#legend").innerHTML = `<span><i style="background:#b6f23a"></i>Prioridad alta</span><span><i style="background:#f5a524"></i>Media</span><span><i style="background:#5b665e"></i>Baja</span>`; return; }
   const dpr = window.devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight;
   if (cv.width !== Math.round(W*dpr) || cv.height !== Math.round(H*dpr)) { cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr); }
   ctx.setTransform(dpr,0,0,dpr,0,0);
@@ -984,6 +1037,7 @@ function setStatus(){
   $("#status").innerHTML = !window.claude ? "<b>Escaneo en vivo listo</b><br>datos de OpenStreetMap" : hasBrowser ?"<b>Escaneo en vivo listo</b><br>navegador de la app" : "Modo consulta<br><span>escanea desde la app de escritorio</span>";
 }
 leads = store.get("rn_leads", {});
+if (!IN_CLAUDE) initRealMap();
 renderSectPick(); renderPrices();
 scan = store.get("rn_last", null) || exampleScan();
 renderAll();
