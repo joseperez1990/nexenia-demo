@@ -421,13 +421,21 @@ async function initRealMap(){
     const el = $("#lmap"); el.hidden = false; cv.hidden = true;
     document.querySelector(".mapctl").hidden = true;
     LMAP = L.map(el, {zoomControl:true, attributionControl:true, preferCanvas:true}).setView([36.764,-2.615], 12);
+    let tilesOK = false;
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19, className: "rn-tiles",
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(LMAP);
+    }).on("tileload", () => { tilesOK = true; }).addTo(LMAP);
     LLAYER = L.layerGroup().addTo(LMAP);
     drawMap();
-  }catch(e){ $("#lmap").hidden = true; cv.hidden = false; document.querySelector(".mapctl").hidden = false; drawMap(); }
+    setTimeout(() => { if (!tilesOK) radarFallback(); }, 8000);
+  }catch(e){ radarFallback(); }
+}
+function radarFallback(){
+  try { if (LMAP) LMAP.remove(); } catch(e){}
+  LMAP = null; LKEY = "";
+  $("#lmap").hidden = true; cv.hidden = false; document.querySelector(".mapctl").hidden = false;
+  drawMap();
 }
 function drawRealMap(){
   if (!scan) return;
@@ -607,7 +615,15 @@ let lastRaw = null;
 /* Fuera de Claude (tu web) se pide todo directamente; dentro de Claude, por el navegador de la app */
 const IN_CLAUDE = !!(window.claude && window.claude.use);
 async function get(url, opts, ms){
-  if (!IN_CLAUDE){
+  try { return await direct(url, opts, ms); }
+  catch(e){
+    if (!(window.claude && window.claude.use) || !mcp) throw e;
+    if (opts && opts.body) url += (url.includes("?")?"&":"?") + opts.body.toString();
+    return browse(url);
+  }
+}
+async function direct(url, opts, ms){
+  {
     const ctl = new AbortController(), to = setTimeout(()=>ctl.abort(), ms||60000);
     try{
       const r = await fetch(url, Object.assign({signal:ctl.signal}, opts||{}));
@@ -618,8 +634,6 @@ async function get(url, opts, ms){
       throw {code:"http", message: e && e.name==="AbortError" ? "no respondió a tiempo" : "sin conexión o bloqueado por el navegador"};
     } finally { clearTimeout(to); }
   }
-  if (opts && opts.body) url += (url.includes("?")?"&":"?") + opts.body.toString();
-  return browse(url);
 }
 async function fetchText(url){ return get(url); }
 /* Varios servidores de OpenStreetMap: si uno está saturado se prueba el siguiente */
@@ -714,7 +728,6 @@ let DATA_INDEX;
 const DATA_BASE = /joseperez1990\.github\.io$/.test(location.host) && /\/radar\//.test(location.pathname) ? "data/" : "https://joseperez1990.github.io/nexenia-demo/radar/data/";
 async function localIndex(){
   if (DATA_INDEX !== undefined) return DATA_INDEX;
-  if (IN_CLAUDE) return DATA_INDEX = null;
   try{ const r = await fetch(DATA_BASE+"index.json", {cache:"no-cache"}); DATA_INDEX = r.ok ? await r.json() : null; }
   catch(e){ DATA_INDEX = null; }
   return DATA_INDEX;
@@ -1108,10 +1121,12 @@ $("#prices").addEventListener("change", e => { const i=e.target; if(!i.dataset.k
 
 /* ---------- Arranque ---------- */
 function setStatus(){
+  if (DATA_INDEX){ $("#status").innerHTML = "<b>Escaneo listo</b><br>"+fmt(DATA_INDEX.count)+" negocios en España"; return; }
   $("#status").innerHTML = !window.claude ? "<b>Escaneo en vivo listo</b><br>datos de OpenStreetMap" : hasBrowser ?"<b>Escaneo en vivo listo</b><br>navegador de la app" : "Modo consulta<br><span>escanea desde la app de escritorio</span>";
 }
 leads = store.get("rn_leads", {});
-if (!IN_CLAUDE) initRealMap();
+localIndex().then(() => setStatus());
+initRealMap();
 renderSectPick(); renderPrices();
 scan = store.get("rn_last", null) || exampleScan();
 renderAll();
