@@ -682,10 +682,12 @@ function toItem(el, c){
 
 /* Datos propios: teselas generadas cada mes por GitHub a partir de OpenStreetMap (carpeta data/) */
 let DATA_INDEX;
+/* En GitHub lee su carpeta data/; desde cualquier otro sitio (tu Netlify o el archivo abierto en el móvil) lee los mismos datos de GitHub */
+const DATA_BASE = /joseperez1990\.github\.io$/.test(location.host) && /\/radar\//.test(location.pathname) ? "data/" : "https://joseperez1990.github.io/nexenia-demo/radar/data/";
 async function localIndex(){
   if (DATA_INDEX !== undefined) return DATA_INDEX;
-  if (IN_CLAUDE || location.protocol === "file:") return DATA_INDEX = null;
-  try{ const r = await fetch("data/index.json", {cache:"no-cache"}); DATA_INDEX = r.ok ? await r.json() : null; }
+  if (IN_CLAUDE) return DATA_INDEX = null;
+  try{ const r = await fetch(DATA_BASE+"index.json", {cache:"no-cache"}); DATA_INDEX = r.ok ? await r.json() : null; }
   catch(e){ DATA_INDEX = null; }
   return DATA_INDEX;
 }
@@ -699,7 +701,7 @@ async function scanLocal(place, km){
   const items = [], want = new Set(selSects);
   let done = 0;
   await Promise.all(keys.map(async k => {
-    const r = await fetch("data/t_"+k+".json"); if (!r.ok) throw new Error("tesela "+k);
+    const r = await fetch(DATA_BASE+"t_"+k+".json"); if (!r.ok) throw new Error("tesela "+k);
     const rows = await r.json();
     for (const x of rows){
       if (!want.has(x[2])) continue;
