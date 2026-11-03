@@ -242,7 +242,8 @@ a{color:var(--blue)}
 
   <details class="sec">
     <summary><h4 style="display:inline">Tus precios (edítalos)</h4></summary>
-    <p style="font-size:13px;color:var(--muted);margin:4px 0 8px">Son estimaciones de partida para pymes locales. Ajústalas a tu tarifa real: el precio de cada negocio se recalcula con estos valores.</p>
+    <p style="font-size:13px;color:var(--muted);margin:4px 0 8px">Precios medios de mercado en España para pymes (noviembre 2026, sin IVA). Cada negocio recibe solo los servicios que le faltan según su tipo; el software a medida se ajusta por sector (clínicas ×1,3, hoteles ×1,2, oficios ×0,8). Cámbialos a tu tarifa y todo se recalcula.</p>
+    <p style="font-size:12px;color:var(--muted);margin:0 0 10px">Fuentes: webs 500–1.000 € y mantenimiento 30–100 €/mes (<a href="https://trustlocal.es/coste/diseno-web-coste/" target="_blank" rel="noopener">Trustlocal</a>) · agentes IA a medida 3.000–5.000 € + 100–300 €/mes y no-code 0–500 € + 25–180 €/mes (<a href="https://thepower.education/blog/ia/cuanto-cuesta-un-agente-de-ia-en-una-pyme" target="_blank" rel="noopener">ThePower</a>, <a href="https://www.javadex.es/blog/agente-ia-whatsapp-business-empresa-precio-2026" target="_blank" rel="noopener">Javadex</a>) · recepcionistas IA 39–299 €/mes e instalación 299–1.250 € (<a href="https://ainora.lt/es/blog/mejores-recepcionistas-virtuales-ia-espana-2026" target="_blank" rel="noopener">AInora</a>) · software a medida desde 5.000 € + 200–800 €/mes (<a href="https://duotach.com/blog/software-a-medida-madrid-barcelona" target="_blank" rel="noopener">Duotach</a>) · automatizaciones 500–2.000 € (<a href="https://www.javadex.es/blog/automatizacion-pymes-n8n-consultoria-espana-guia" target="_blank" rel="noopener">Javadex</a>) · anuncios: freelance 200–500 €/mes + 150–300 € de alta (<a href="https://lionelz.com/blog/precio-consultor-google-ads/" target="_blank" rel="noopener">Lionelz</a>) · reservas: Booksy 35 €/mes (<a href="https://pabau.com/es/blog/booksy-precio/" target="_blank" rel="noopener">Pabau</a>) · logotipo 300–1.200 € (<a href="https://www.cronoshare.com/cuanto-cuesta/diseno-logotipo" target="_blank" rel="noopener">Cronoshare</a>).</p>
     <div class="prices" id="prices"></div>
   </details>
 
@@ -277,21 +278,38 @@ const SECT = {
 const KIND = {restaurant:"Restaurante",cafe:"Cafetería",bar:"Bar",fast_food:"Comida rápida",pub:"Pub",ice_cream:"Heladería",hairdresser:"Peluquería",beauty:"Estética",cosmetics:"Cosmética",massage:"Masajes",tattoo:"Tatuajes",nails:"Uñas",fitness_centre:"Gimnasio",dentist:"Dentista",clinic:"Clínica",doctors:"Consulta médica",veterinary:"Veterinario",physiotherapist:"Fisioterapia",psychotherapist:"Psicología",podiatrist:"Podología",optometrist:"Óptica",car:"Concesionario",car_repair:"Taller",tyres:"Neumáticos",car_parts:"Recambios",motorcycle:"Motos",car_wash:"Lavadero",driving_school:"Autoescuela",car_rental:"Alquiler de coches",hotel:"Hotel",guest_house:"Hostal",hostel:"Albergue",apartment:"Apartamentos",motel:"Motel",camp_site:"Camping",lawyer:"Abogados",accountant:"Asesoría",estate_agent:"Inmobiliaria",insurance:"Seguros",architect:"Arquitectura",tax_advisor:"Asesor fiscal",notary:"Notaría",financial:"Finanzas",travel_agent:"Agencia de viajes",travel_agency:"Agencia de viajes",employment_agency:"Agencia de empleo",clothes:"Ropa",shoes:"Zapatería",furniture:"Muebles",electronics:"Electrónica",bakery:"Panadería",butcher:"Carnicería",florist:"Floristería",optician:"Óptica",jewelry:"Joyería",bicycle:"Bicicletas",hardware:"Ferretería",pet:"Mascotas",sports:"Deportes",toys:"Juguetes",gift:"Regalos",mobile_phone:"Telefonía",books:"Librería",kitchen:"Cocinas",interior_decoration:"Decoración",garden_centre:"Vivero",wine:"Vinoteca",deli:"Delicatessen",confectionery:"Dulces",pastry:"Pastelería",electrician:"Electricista",plumber:"Fontanero",carpenter:"Carpintería",painter:"Pintor",builder:"Construcción",hvac:"Climatización",roofer:"Tejados",glaziery:"Cristalería",locksmith:"Cerrajero",metal_construction:"Cerrajería metálica",gardener:"Jardinería",tiler:"Alicatados",doityourself:"Bricolaje",trade:"Almacén",kindergarten:"Guardería",language_school:"Academia de idiomas",music_school:"Escuela de música",dancing_school:"Escuela de baile",prep_school:"Academia",sports_centre:"Centro deportivo",dance:"Baile"};
 
 /* ---------- Servicios y precios (editables) ---------- */
+/* Precios medios de mercado para pymes en España (estudio nov. 2026; fuentes en "Tus precios").
+   p = precio de implantación (pago único, sin IVA) · m = cuota mensual (sin IVA) */
 const DEF_PRICES = {
-  web:{l:"Web a medida",ic:"🌐",p:900,m:0},
-  webfix:{l:"Web nueva (la actual no funciona)",ic:"🛠️",p:1100,m:0},
-  agente:{l:"Agente IA WhatsApp / teléfono 24/7",ic:"🤖",p:1200,m:79},
-  reservas:{l:"Reservas / citas online",ic:"📅",p:600,m:29},
-  saas:{l:"SaaS a medida (gestión)",ic:"🧩",p:2500,m:99},
-  crm:{l:"CRM + captación de clientes",ic:"📈",p:1200,m:49},
-  automatiza:{l:"Automatizaciones",ic:"⚙️",p:800,m:0},
-  tienda:{l:"Tienda online / catálogo WhatsApp",ic:"🛒",p:1400,m:29},
-  ads:{l:"Campañas Meta Ads locales",ic:"📣",p:0,m:250},
-  seo:{l:"Ficha Google + SEO local",ic:"📍",p:350,m:0},
-  marca:{l:"Marca e imagen",ic:"🎨",p:450,m:0}
+  web:{l:"Web profesional (3–5 páginas)",ic:"🌐",p:750,m:30},
+  webfix:{l:"Web nueva (la actual no funciona o está anticuada)",ic:"🛠️",p:850,m:30},
+  tienda:{l:"Tienda online",ic:"🛒",p:1400,m:40},
+  reservas:{l:"Reservas / citas online",ic:"📅",p:450,m:35},
+  agente:{l:"Agente IA de WhatsApp (citas, dudas, pedidos)",ic:"🤖",p:1500,m:150},
+  voz:{l:"Recepcionista IA de llamadas",ic:"📞",p:900,m:150},
+  saas:{l:"Software de gestión a medida (SaaS)",ic:"🧩",p:5000,m:200},
+  crm:{l:"CRM + seguimiento de clientes",ic:"📈",p:1200,m:50},
+  automatiza:{l:"Automatizaciones (2–5 procesos)",ic:"⚙️",p:1250,m:0},
+  seo:{l:"Ficha de Google + SEO local",ic:"📍",p:350,m:0},
+  ads:{l:"Gestión de anuncios Meta/Google",ic:"📣",p:200,m:350},
+  marca:{l:"Logotipo e imagen",ic:"🎨",p:400,m:0}
 };
+/* Lo que necesita cada tipo de negocio, en orden de prioridad (k = solo esos tipos) */
+const NEEDS = {
+  hosteleria:[["agente"],["reservas",["restaurant"]],["voz",["restaurant","fast_food"]]],
+  belleza:[["agente"],["reservas"]],
+  salud:[["agente"],["voz"],["reservas"],["saas"]],
+  motor:[["agente"],["voz"],["saas"]],
+  alojamiento:[["reservas"],["agente"],["saas"]],
+  profesional:[["crm"],["agente"],["automatiza"]],
+  comercio:[["ads"]],
+  oficios:[["agente"],["voz"],["crm"]],
+  formacion:[["reservas"],["agente"],["saas"]]
+};
+/* El software a medida cuesta distinto según la complejidad del sector */
+const SAAS_FACTOR = {salud:1.3, alojamiento:1.2, motor:1, profesional:1, formacion:0.9, hosteleria:0.9, oficios:0.8};
 let PRICES = Object.assign({}, DEF_PRICES);
-const savedP = store.get("rn_prices", null);
+const savedP = store.get("rn_prices2", null);
 if (savedP) for (const k in savedP) if (PRICES[k]) PRICES[k] = Object.assign({}, PRICES[k], {p:+savedP[k].p||0, m:+savedP[k].m||0});
 
 /* ---------- Estado ---------- */
@@ -314,18 +332,30 @@ function analyse(it){
   const S = SECT[it.s] || {w:10,svc:["agente"]};
   const gaps = [], svc = new Set();
   let score = S.w;
+  const webKey = it.s === "comercio" ? "tienda" : "web";
   if (a.broken) { gaps.push("Su web no carga"); svc.add("webfix"); score += 30; }
-  else if (!web) { gaps.push(v.checked ? "Sin web (verificado)" : "Sin web registrada"); svc.add("web"); score += v.checked ? 38 : 30; }
+  else if (!web) { gaps.push(v.checked ? "Sin web (verificado)" : "Sin web registrada"); svc.add(webKey); score += v.checked ? 38 : 30; }
   else if (a.old) { gaps.push("Web anticuada"); svc.add("webfix"); score += 18; }
+  else if (it.s === "comercio" && a.checked && !a.tienda) { gaps.push("No vende online"); svc.add("tienda"); score += 10; }
   if (a.checked && !a.booking && S.svc.includes("reservas")) { gaps.push("No reserva online"); score += 10; }
   if (!it.p) { gaps.push("Sin teléfono público"); score += 6; }
-  if (!it.h) { gaps.push("Sin horario publicado"); svc.add("seo"); score += 8; }
-  S.svc.forEach(k => svc.add(k));
+  const needSeo = !it.h; if (needSeo) { gaps.push("Sin horario publicado"); score += 8; }
+  for (const [k, kinds] of (NEEDS[it.s] || [["agente"]])){
+    if (kinds && !kinds.includes(it.k)) continue;
+    if (k === "reservas" && a.checked && a.booking) continue;
+    if (k === "agente" && a.checked && (a.chat || a.whatsapp) && a.booking) continue;
+    svc.add(k);
+  }
+  if (needSeo) svc.add("seo");
   if (!it.e && !v.email) score += 3;
   score = Math.min(99, score);
-  let setup = 0, monthly = 0;
-  svc.forEach(k => { const P = PRICES[k]; if (P){ setup += P.p; monthly += P.m; } });
-  const tier = setup >= 3500 ? "alta" : setup >= 1500 ? "media" : "baja";
+  const priceOf = k => { const P = PRICES[k]; if (!P) return {p:0,m:0}; const f = k==="saas" ? (SAAS_FACTOR[it.s]||1) : 1; return {p:Math.round(P.p*f/50)*50, m:Math.round(P.m*f/5)*5}; };
+  const list = [...svc].filter(k => PRICES[k]);
+  // Pack de entrada: lo primero que necesita (web + su servicio principal); el resto es potencial
+  const pack = list.slice(0, 2);
+  let setup = 0, monthly = 0, total = 0, totalM = 0;
+  list.forEach(k => { const x = priceOf(k); total += x.p; totalM += x.m; if (pack.includes(k)){ setup += x.p; monthly += x.m; } });
+  const tier = total >= 3500 ? "alta" : total >= 1500 ? "media" : "baja";
 
   /* Prioridad de venta: estimación con señales objetivas (no es una certeza) */
   const why = [];
@@ -350,7 +380,7 @@ function analyse(it){
   if (st==="descartado") add(-60, "Marcado como descartado");
   prob = Math.max(1, Math.min(95, Math.round(prob)));
   const ptier = prob >= 55 ? "alta" : prob >= 35 ? "media" : "baja";
-  return {gaps, svc:[...svc], score, setup, monthly, tier, web, prob, ptier, why};
+  return {gaps, svc:list, pack, priceOf, score, setup, monthly, total, totalM, tier, web, prob, ptier, why};
 }
 const CHAIN_RE = /\b(mcdonald|burger king|telepizza|domino|100 montaditos|foster|vips|ginos|tgb|kfc|starbucks|five guys|goiko|tagliatella|rodilla|granier|panaria|llaollao|mercadona|carrefour|lidl|aldi|dia\b|eroski|consum|zara|primark|mango|decathlon|leroy merlin|bricomart|norauto|midas|feu vert|euromaster|vitaldent|dentix|sanitas|quir[oó]n|general [oó]ptica|multi[oó]pticas|alain afflelou|opticalia|marco aldany|llongueras|tecnocasa|remax|re\/max|century 21|halcon viajes|viajes el corte|nautalia|basic.?fit|mcfit|anytime fitness|vivagym|holiday inn|nh\b|melia|barcel[oó]|ibis|b&b hotel|movistar|vodafone|orange|yoigo|phone house|pans|subway|popeyes|tim hortons|taco bell|udon|sushi shop|lizarran|cervecer[ií]a 100|la sure[ñn]a|tony roma)/i;
 function isChain(it){ return !!it.br || CHAIN_RE.test(it.n); }
@@ -413,7 +443,7 @@ function drawRealMap(){
       color: st && st!=="nuevo" ? "#7cc4ff" : "#0b0e0c",
       fillColor: colorFor(it._a.ptier), fillOpacity: .95
     });
-    m.bindTooltip(`${esc(it.n)} · ${it._a.prob}% · hasta ${fmt(it._a.setup)} €`, {className:"rn-tip", direction:"top", offset:[0,-6]});
+    m.bindTooltip(`${esc(it.n)} · ${it._a.prob}% · pack ${fmt(it._a.setup)} €`, {className:"rn-tip", direction:"top", offset:[0,-6]});
     m.on("click", () => openSheet(it.id));
     m.addTo(LLAYER);
   }
@@ -460,7 +490,7 @@ cv.addEventListener("pointermove", e => {
   const r = cv.getBoundingClientRect();
   if (drag){ const dx=e.clientX-drag.x, dy=e.clientY-drag.y; if (Math.abs(dx)+Math.abs(dy)>4) moved=true; view.x=drag.vx+dx; view.y=drag.vy+dy; drawMap(); return; }
   const h = hit(e.clientX-r.left, e.clientY-r.top), tip = $("#tip");
-  if (h){ tip.hidden=false; tip.style.left=Math.min(h.x+12, r.width-230)+"px"; tip.style.top=(h.y+12)+"px"; tip.textContent = h.it.n+" · hasta "+fmt(h.it._a.setup)+" €"; } else tip.hidden=true;
+  if (h){ tip.hidden=false; tip.style.left=Math.min(h.x+12, r.width-230)+"px"; tip.style.top=(h.y+12)+"px"; tip.textContent = h.it.n+" · pack "+fmt(h.it._a.setup)+" €"; } else tip.hidden=true;
 });
 cv.addEventListener("pointerup", e => { const r=cv.getBoundingClientRect(); if (!moved){ const h=hit(e.clientX-r.left,e.clientY-r.top); if(h) openSheet(h.it.id); } drag=null; });
 cv.addEventListener("wheel", e => { e.preventDefault(); zoom(e.deltaY<0?1.25:0.8); }, {passive:false});
@@ -489,13 +519,13 @@ function renderAll(){
   $("#sects").innerHTML = sects.map(([k,l,ic,c]) => `<button class="sect" data-s="${k}" aria-pressed="${filt.sect===k}"><span class="ic">${ic}</span><span class="nm">${esc(l)}</span><span class="ct">${fmt(c)}</span></button>`).join("");
   $("#wherePill").innerHTML = scan.example ? "📍 Ejemplo <small>· datos ficticios</small>" : `📍 ${esc(scan.city)} <small>· ${scan.radius} km</small>`;
   $("#mapTag").textContent = scan.example ? "Ejemplo · datos ficticios" : `${scan.radius} km · ${fmt(scan.items.length)} negocios`;
-  const tot = scan.items.reduce((a,it)=>a+it._a.setup,0), noweb = scan.items.filter(it=>!it._a.web).length, ph = scan.items.filter(it=>it.p).length;
+  const tot = scan.items.reduce((a,it)=>a+it._a.total,0), noweb = scan.items.filter(it=>!it._a.web).length, ph = scan.items.filter(it=>it.p).length;
   $("#kpi").innerHTML = `<b>${fmt(noweb)}</b> sin web · <b>${fmt(ph)}</b> con teléfono<br>Potencial: <b>${fmt(tot)} €</b>`;
   renderPrio(); renderList(); drawMap();
 }
 const SORTS = {
   prob:{l:"⇅ Más fácil de vender primero", f:(a,b)=>b._a.prob-a._a.prob || a.d-b.d},
-  money:{l:"⇅ Más dinero primero", f:(a,b)=>b._a.setup-a._a.setup || b._a.prob-a._a.prob},
+  money:{l:"⇅ Más dinero primero", f:(a,b)=>b._a.total-a._a.total || b._a.prob-a._a.prob},
   near:{l:"⇅ Más cerca primero", f:(a,b)=>a.d-b.d}
 };
 const RANK = {alta:0,media:1,baja:2};
@@ -527,7 +557,7 @@ function cardHTML(it){
   const mail = it.e ? `<span>✉ ${esc(it.e)}</span>` : "";
   return `<button class="card" data-id="${esc(it.id)}">
     <div><div class="nm">${esc(it.n)}</div><div class="sub">${esc(KIND[it.k]||it.k)} · ${it.d.toLocaleString("es-ES")} km · <em>${esc(A.gaps[0]||"Datos completos")}</em> ${st}</div></div>
-    <div class="side"><span class="badge ${A.ptier}" title="Probabilidad estimada de venta">${PT[A.ptier].l} · ${A.prob}%</span><span class="price"><small>hasta</small> ${fmt(A.setup)} €</span>${A.monthly?`<span class="monthly">+${fmt(A.monthly)} €/mes</span>`:""}</div>
+    <div class="side"><span class="badge ${A.ptier}" title="Probabilidad estimada de venta">${PT[A.ptier].l} · ${A.prob}%</span><span class="price"><small>pack</small> ${fmt(A.setup)} €</span>${A.monthly?`<span class="monthly">+${fmt(A.monthly)} €/mes</span>`:""}${A.total>A.setup?`<span class="monthly">potencial ${fmt(A.total)} €</span>`:""}</div>
     <div class="tags">${tagsHTML}</div>
     <div class="contact">${phone}${mail}</div>
   </button>`;
@@ -909,7 +939,7 @@ function openSheet(id){
   $("#sheetIn").innerHTML = `
     <button class="close" id="shClose">Cerrar</button>
     <div><h3 id="shTitle">${esc(it.n)}</h3><div style="color:var(--muted);font-size:14px">${esc(KIND[it.k]||it.k)} · ${esc(SECT[it.s]?.l||"")} · a ${it.d.toLocaleString("es-ES")} km</div></div>
-    <div style="display:flex;gap:16px;align-items:baseline;flex-wrap:wrap"><span class="price"><small>hasta</small> ${fmt(A.setup)} €</span>${A.monthly?`<span class="monthly">+${fmt(A.monthly)} €/mes</span>`:""}<span class="badge ${A.ptier}">Prioridad ${A.ptier} · ${A.prob}%</span></div>
+    <div style="display:flex;gap:16px;align-items:baseline;flex-wrap:wrap"><span class="price"><small>pack de entrada</small> ${fmt(A.setup)} €</span>${A.monthly?`<span class="monthly">+${fmt(A.monthly)} €/mes</span>`:""}<span class="badge ${A.ptier}">Prioridad ${A.ptier} · ${A.prob}%</span></div>
     <div class="sec"><h4>Por qué esta prioridad</h4>${A.why.map(w=>`<div class="gap"><span${w[0]==="−"?' class="why"':""}>${esc(w)}</span></div>`).join("")}<div class="why" style="font-size:12px">Es una estimación con datos públicos, no una garantía. Ajústala con lo que veas al llamar (estado “Interesado” la sube, “Descartado” la baja).</div></div>
     <dl class="kv">
       <dt>Teléfono</dt><dd class="mono">${it.p?esc(it.p)+` <button class="abtn" data-copy="${esc(it.p)}" style="padding:3px 8px;font-size:12px">Copiar</button>`:"<span style='color:var(--muted)'>No consta</span>"}</dd>
@@ -921,8 +951,10 @@ function openSheet(id){
       <dt>Mapas</dt><dd><a href="${maps}" target="_blank" rel="noopener">Ver en Google Maps</a></dd>
     </dl>
     <div class="sec"><h4>Lo que le falta</h4>${A.gaps.length?A.gaps.map(g=>`<div class="gap"><span>${esc(g)}</span></div>`).join(""):"<div class='gap'><span>Ficha completa en OSM. Audita su web para encontrar huecos.</span></div>"}</div>
-    <div class="sec"><h4>Qué le puedes vender</h4>${A.svc.map(k=>{const P=PRICES[k];return `<div class="gap"><span>${P.ic} ${esc(P.l)}</span><b>${P.p?fmt(P.p)+" €":""}${P.p&&P.m?" + ":""}${P.m?fmt(P.m)+" €/mes":""}</b></div>`;}).join("")}
-      <div class="gap" style="border:0"><span><b style="color:var(--fg);font-family:var(--body)">Total</b></span><b>${fmt(A.setup)} €${A.monthly?" + "+fmt(A.monthly)+" €/mes":""}</b></div></div>
+    <div class="sec"><h4>Qué le puedes vender (precio medio en España)</h4>${A.svc.map(k=>{const P=PRICES[k], x=A.priceOf(k);return `<div class="gap"><span>${P.ic} ${esc(P.l)}${A.pack.includes(k)?' <span class="stchip">pack de entrada</span>':""}</span><b>${x.p?fmt(x.p)+" €":""}${x.p&&x.m?" + ":""}${x.m?fmt(x.m)+" €/mes":""}</b></div>`;}).join("")}
+      <div class="gap"><span><b style="color:var(--fg);font-family:var(--body)">Pack de entrada</b> <span class="why">(lo primero que le ofreces)</span></span><b>${fmt(A.setup)} €${A.monthly?" + "+fmt(A.monthly)+" €/mes":""}</b></div>
+      <div class="gap" style="border:0"><span><b style="color:var(--fg);font-family:var(--body)">Potencial total</b> <span class="why">(si contrata todo)</span></span><b>${fmt(A.total)} €${A.totalM?" + "+fmt(A.totalM)+" €/mes":""}</b></div>
+      <div class="why" style="font-size:12px">Precios sin IVA. Son medias de mercado: ajústalos en “Tus precios”.</div></div>
     <div class="sec"><h4>Comprobar antes de llamar</h4>
       <div class="actions">
         <button class="abtn" id="aVerif">🔎 Verificar en buscador</button>
@@ -1056,8 +1088,8 @@ async function openSaved(id){
 /* ---------- Exportar ---------- */
 $("#exportBtn").onclick = async () => {
   if (!scan) return;
-  const rows = [["Prioridad","Probabilidad %","Nombre","Tipo","Distancia km","Teléfono","Email","Web","Dirección","Lo que le falta","Servicios","Precio (€)","Cuota (€/mes)","Estado","Notas"]];
-  visible().slice().sort((a,b)=>analyse(b).prob-analyse(a).prob).forEach(it => { const A=analyse(it), L=leads[it.id]||{}; rows.push([A.ptier,A.prob,it.n,KIND[it.k]||it.k,it.d,it.p,it.e,A.web,it.a,A.gaps.join(" | "),A.svc.map(k=>PRICES[k].l).join(" | "),A.setup,A.monthly,ESTADOS[L.estado||"nuevo"],L.nota||""]); });
+  const rows = [["Prioridad","Probabilidad %","Nombre","Tipo","Distancia km","Teléfono","Email","Web","Dirección","Lo que le falta","Servicios","Pack de entrada (€)","Pack (€/mes)","Potencial total (€)","Potencial (€/mes)","Estado","Notas"]];
+  visible().slice().sort((a,b)=>analyse(b).prob-analyse(a).prob).forEach(it => { const A=analyse(it), L=leads[it.id]||{}; rows.push([A.ptier,A.prob,it.n,KIND[it.k]||it.k,it.d,it.p,it.e,A.web,it.a,A.gaps.join(" | "),A.svc.map(k=>PRICES[k].l).join(" | "),A.setup,A.monthly,A.total,A.totalM,ESTADOS[L.estado||"nuevo"],L.nota||""]); });
   const csv = "﻿"+rows.map(r=>r.map(c=>`"${String(c??"").replace(/"/g,'""')}"`).join(";")).join("\r\n");
   if (!downloads){
     if (!window.claude){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download=`radar-nexenia-${(scan.city||"zona").toLowerCase().replace(/\s+/g,"-")}.csv`; document.body.appendChild(a); a.click(); a.remove(); return; }
@@ -1072,7 +1104,7 @@ function renderPrices(){
   $("#prices").innerHTML = `<span class="h">Servicio</span><span class="h">Precio €</span><span class="h">€/mes</span>` + Object.entries(PRICES).map(([k,P]) =>
     `<label for="pp_${k}">${P.ic} ${esc(P.l)}</label><input id="pp_${k}" data-k="${k}" data-f="p" type="number" min="0" step="50" value="${P.p}"><input id="pm_${k}" data-k="${k}" data-f="m" type="number" min="0" step="5" value="${P.m}" aria-label="${esc(P.l)} cuota mensual">`).join("");
 }
-$("#prices").addEventListener("change", e => { const i=e.target; if(!i.dataset.k) return; PRICES[i.dataset.k][i.dataset.f]=Math.max(0,+i.value||0); store.set("rn_prices",PRICES); renderAll(); });
+$("#prices").addEventListener("change", e => { const i=e.target; if(!i.dataset.k) return; PRICES[i.dataset.k][i.dataset.f]=Math.max(0,+i.value||0); store.set("rn_prices2",PRICES); renderAll(); });
 
 /* ---------- Arranque ---------- */
 function setStatus(){
