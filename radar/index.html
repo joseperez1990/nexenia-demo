@@ -418,8 +418,9 @@ function drawRealMap(){
     m.on("click", () => openSheet(it.id));
     m.addTo(LLAYER);
   }
-  if (key !== LKEY){ LKEY = key; LMAP.fitBounds(ring.getBounds(), {padding:[10,10]}); }
-  setTimeout(()=>LMAP.invalidateSize(), 50);
+  LMAP.invalidateSize();
+  if (key !== LKEY){ LKEY = key; LMAP._rnFit = false; LMAP.fitBounds(ring.getBounds(), {padding:[10,10]}); }
+  setTimeout(()=>{ LMAP.invalidateSize(); if (LKEY===key && !LMAP._rnFit){ LMAP.fitBounds(ring.getBounds(), {padding:[10,10]}); LMAP._rnFit = true; } }, 250);
 }
 function drawMap(){
   if (LMAP){ drawRealMap(); $("#legend").innerHTML = `<span><i style="background:#b6f23a"></i>Prioridad alta</span><span><i style="background:#f5a524"></i>Media</span><span><i style="background:#5b665e"></i>Baja</span>`; return; }
@@ -494,7 +495,7 @@ function renderAll(){
   renderPrio(); renderList(); drawMap();
 }
 const SORTS = {
-  prob:{l:"⇅ Más fácil de vender primero", f:(a,b)=>b._a.prob-a._a.prob || b._a.setup-a._a.setup},
+  prob:{l:"⇅ Más fácil de vender primero", f:(a,b)=>b._a.prob-a._a.prob || a.d-b.d},
   money:{l:"⇅ Más dinero primero", f:(a,b)=>b._a.setup-a._a.setup || b._a.prob-a._a.prob},
   near:{l:"⇅ Más cerca primero", f:(a,b)=>a.d-b.d}
 };
