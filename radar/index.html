@@ -288,7 +288,6 @@ const DEF_PRICES = {
   tienda:{l:"Tienda online / catálogo WhatsApp",ic:"🛒",p:1400,m:29},
   ads:{l:"Campañas Meta Ads locales",ic:"📣",p:0,m:250},
   seo:{l:"Ficha Google + SEO local",ic:"📍",p:350,m:0},
-  redes:{l:"Redes sociales",ic:"📱",p:0,m:200},
   marca:{l:"Marca e imagen",ic:"🎨",p:450,m:0}
 };
 let PRICES = Object.assign({}, DEF_PRICES);
@@ -321,7 +320,6 @@ function analyse(it){
   if (a.checked && !a.booking && S.svc.includes("reservas")) { gaps.push("No reserva online"); score += 10; }
   if (!it.p) { gaps.push("Sin teléfono público"); score += 6; }
   if (!it.h) { gaps.push("Sin horario publicado"); svc.add("seo"); score += 8; }
-  if (!ig && !fb) { gaps.push("Sin redes enlazadas"); svc.add("redes"); score += 8; }
   S.svc.forEach(k => svc.add(k));
   if (!it.e && !v.email) score += 3;
   score = Math.min(99, score);
