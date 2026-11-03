@@ -678,11 +678,51 @@ function toItem(el, c){
     e:t.email||t["contact:email"]||"", h:t.opening_hours||"", ig:t["contact:instagram"]||"", fb:t["contact:facebook"]||"", a:addr, br:t.brand||""};
 }
 
+/* Datos propios: teselas generadas cada mes por GitHub a partir de OpenStreetMap (carpeta data/) */
+let DATA_INDEX;
+async function localIndex(){
+  if (DATA_INDEX !== undefined) return DATA_INDEX;
+  if (IN_CLAUDE || location.protocol === "file:") return DATA_INDEX = null;
+  try{ const r = await fetch("data/index.json", {cache:"no-cache"}); DATA_INDEX = r.ok ? await r.json() : null; }
+  catch(e){ DATA_INDEX = null; }
+  return DATA_INDEX;
+}
+async function scanLocal(place, km){
+  const idx = await localIndex(); if (!idx) return null;
+  const T = idx.tile, dLat = km/111, dLon = km/(111*Math.cos(place.lat*Math.PI/180));
+  const have = new Set(idx.tiles), keys = [];
+  for (let a=Math.floor((place.lat-dLat)/T); a<=Math.floor((place.lat+dLat)/T); a++)
+    for (let o=Math.floor((place.lon-dLon)/T); o<=Math.floor((place.lon+dLon)/T); o++)
+      if (have.has(a+"_"+o)) keys.push(a+"_"+o);
+  const items = [], want = new Set(selSects);
+  let done = 0;
+  await Promise.all(keys.map(async k => {
+    const r = await fetch("data/t_"+k+".json"); if (!r.ok) throw new Error("tesela "+k);
+    const rows = await r.json();
+    for (const x of rows){
+      if (!want.has(x[2])) continue;
+      const d = hav(place.lat, place.lon, x[4], x[5]); if (d > km) continue;
+      items.push({id:x[0], n:x[1], s:x[2], k:x[3], lat:x[4], lon:x[5], d:+d.toFixed(2), w:x[6], p:x[7], e:x[8], h:x[9], ig:x[10], fb:x[11], a:x[12], br:x[13]});
+    }
+    busy(`Cargando negocios… ${++done}/${keys.length}`);
+  }));
+  return {items, updated: idx.updated};
+}
 async function runScan(place){
   const km = +$("#rad").value, limit = +$("#lim").value;
   if (!selSects.length){ say("Elige al menos un sector.","warn"); return; }
   const city = place.name.split(",")[0];
   try{
+    busy(`Cargando negocios en ${km} km alrededor de ${city}…`);
+    const loc = await scanLocal(place, km).catch(() => null);
+    if (loc){
+      const items = loc.items;
+      scan = {id:"s"+Date.now(), city, lat:place.lat, lon:place.lon, radius:km, items, sects:selSects.slice(), createdAt:Date.now()};
+      view = {z:1,x:0,y:0}; filt.sect="all"; filt.shown=40;
+      renderAll();
+      say(`<b>${fmt(items.length)} negocios</b> en ${esc(city)} (${km} km). Datos de OpenStreetMap actualizados el ${new Date(loc.updated).toLocaleDateString("es-ES")}. Recuerda: “sin web” es según OpenStreetMap; verifica antes de llamar.`);
+      saveScan(); busy(""); return;
+    }
     // Un sector por petición: respuestas más pequeñas, sin recortes y con un máximo por sector
     const seen = new Set(), items = [], cut = [], full = [], failed = [], errLog = [];
     for (let i=0; i<selSects.length; i++){

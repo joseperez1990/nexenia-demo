@@ -1,0 +1,37 @@
+name: Datos de Radar Nexenia
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 1 * *"
+  push:
+    branches: [main]
+    paths: [".github/workflows/radar-data.yml", "radar/tools/**"]
+permissions:
+  contents: write
+concurrency:
+  group: radar-data
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar osmium
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq osmium-tool
+      - name: Descargar OpenStreetMap de España (Geofabrik)
+        run: curl -sSfL --retry 3 -o spain.osm.pbf https://download.geofabrik.de/europe/spain-latest.osm.pbf && ls -lh spain.osm.pbf
+      - name: Filtrar negocios
+        run: |
+          osmium tags-filter spain.osm.pbf $(cat radar/tools/filter.txt) -o pois.osm.pbf --overwrite
+          osmium export pois.osm.pbf -f geojsonseq --add-unique-id=type_id -o pois.geojsonseq --overwrite
+      - name: Generar teselas
+        run: python3 radar/tools/build.py pois.geojsonseq radar/data && du -sh radar/data
+      - name: Guardar datos
+        run: |
+          git config user.name "radar-bot"
+          git config user.email "radar-bot@users.noreply.github.com"
+          git add radar/data
+          git diff --cached --quiet && echo "Sin cambios" && exit 0
+          git commit -m "Radar: datos de negocios $(date +%Y-%m-%d)"
+          git push
